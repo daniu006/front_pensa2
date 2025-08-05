@@ -1,0 +1,177 @@
+<div class="admin-dashboard-container">
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        ← Back
+      </button>
+      <h1>Advanced Settings</h1>
+      <span class="current-time">{{ currentTime }}</span>
+    </div>
+    <div class="header-right">
+      <button class="logout-btn" (click)="logout()">
+        <span class="logout-icon"></span>
+        Disconnect
+      </button>
+      <button class="refresh-btn" (click)="refreshData()" [disabled]="loading">
+        <span class="refresh-icon" [class.spinning]="loading">🔄</span>
+        {{ loading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-banner">
+    <div class="error-content">
+      <span class="error-icon">⚠️</span>
+      <span class="error-message">{{ error }}</span>
+      <button class="error-close" (click)="clearError()">×</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content">
+    
+    <!-- Loading indicator -->
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading dashboard data...</p>
+      </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <!-- Users Card -->
+      <div class="stat-card users-card" (click)="navigateToUsers()">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ dashboardData.stats.totalUsers }}</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-subtitle">
+            {{ dashboardData.stats.activeUsers }} active, 
+            {{ dashboardData.stats.inactiveUsers }} inactive
+          </div>
+        </div>
+        <div class="stat-arrow">→</div>
+      </div>
+
+      <!-- Speakers Card -->
+      <div class="stat-card speakers-card" (click)="navigateToSpeakers()">
+        <div class="stat-icon">🔊</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ dashboardData.stats.totalSpeakers }}</div>
+          <div class="stat-label">Total Speakers</div>
+          <div class="stat-subtitle">
+            {{ dashboardData.stats.activeSpeakers }} active,
+            {{ dashboardData.stats.inactiveSpeakers }} inactive
+          </div>
+        </div>
+        <div class="stat-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="bottom-grid">
+      <div class="recent-users-section">
+        <h2>Recent Users (Last 3 Created)</h2>
+        
+        <!-- Loading state for users -->
+        <div *ngIf="loading && dashboardData.recentUsers.length === 0" class="users-loading">
+          <div class="loading-text">Loading recent users...</div>
+        </div>
+        
+        <!-- Empty state -->
+        <div *ngIf="!loading && dashboardData.recentUsers.length === 0" class="empty-users">
+          <div class="empty-icon">👥</div>
+          <div class="empty-text">No users found</div>
+          <div class="empty-subtitle">Create your first user to get started</div>
+        </div>
+        
+        <!-- Users list -->
+        <div class="users-list" *ngIf="dashboardData.recentUsers.length > 0">
+          <div class="user-item" *ngFor="let user of dashboardData.recentUsers">
+            <div class="user-avatar">
+              {{ getUserAvatar(user) }}
+            </div>
+            <div class="user-info">
+              <div class="user-name">
+                {{ (user.firstName || user.username) }} {{ user.lastName || '' }}
+              </div>
+              <div class="user-email">{{ user.email }}</div>
+              <div class="user-role">{{ getUserRole(user) }}</div>
+              <div class="user-created">Created: {{ formatCreatedDate(user.createdAt) }}</div>
+            </div>
+            <div class="user-status" [class.active]="user.isActive">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- View all button -->
+        <button class="view-all-btn" (click)="navigateToUsers()" *ngIf="dashboardData.stats.totalUsers > 0">
+          View all {{ dashboardData.stats.totalUsers }} users →
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Speakers Section -->
+    <div class="bottom-grid" *ngIf="dashboardData.stats.totalSpeakers > 0" style="margin-top: 30px;">
+      <div class="recent-users-section">
+        <h2>Recent Speakers (Last 3 Created)</h2>
+        
+        <!-- Loading state for speakers -->
+        <div *ngIf="loading && dashboardData.recentSpeakers.length === 0" class="users-loading">
+          <div class="loading-text">Loading recent speakers...</div>
+        </div>
+        
+        <!-- Empty state -->
+        <div *ngIf="!loading && dashboardData.recentSpeakers.length === 0" class="empty-users">
+          <div class="empty-icon">🔊</div>
+          <div class="empty-text">No speakers found</div>
+          <div class="empty-subtitle">Add your first speaker to get started</div>
+        </div>
+        
+        <!-- Speakers list -->
+        <div class="users-list" *ngIf="dashboardData.recentSpeakers.length > 0">
+          <div class="user-item" *ngFor="let speaker of dashboardData.recentSpeakers; let i = index">
+            <div class="user-avatar" [style.background]="'linear-gradient(45deg, #' + (i === 0 ? 'ffc107' : i === 1 ? 'dc3545' : '8b5cf6') + ', #' + (i === 0 ? 'ffeb3b' : i === 1 ? 'f44336' : 'a855f7') + ')'">
+              🔊
+            </div>
+            <div class="user-info">
+              <div class="user-name">{{ speaker.name }}</div>
+              <div class="user-email">Position: {{ speaker.position }}</div>
+              <div class="user-role">Battery: {{ speaker.batteryPercentage }}% ({{ getSpeakerBatteryStatus(speaker.batteryPercentage) }})</div>
+              <div class="user-created">
+                Sessions: {{ speaker._count.usageSessions || 0 }} | 
+                History: {{ speaker._count.histories || 0 }}
+              </div>
+            </div>
+            <div class="user-status" [class.active]="speaker.state">
+              {{ getSpeakerStatusText(speaker) }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- View all speakers button -->
+        <button class="view-all-btn" (click)="navigateToSpeakers()" *ngIf="dashboardData.stats.totalSpeakers > 0">
+          View all {{ dashboardData.stats.totalSpeakers }} speakers →
+        </button>
+      </div>
+    </div>
+
+    <!-- Last Update Info -->
+    <div class="update-info" *ngIf="!loading">
+      <span class="update-text">
+        Last updated: {{ dashboardData.stats.lastUpdate | date:'MMM d, y, h:mm:ss a' }}
+      </span>
+    </div>
+
+    <!-- NUEVO: Bottom Buttons Section solo para el botón back en responsive -->
+    <div class="bottom-buttons">
+      <button class="back-btn" (click)="goBack()">
+        ← Back
+      </button>
+    </div>
+  </div>
+</div>

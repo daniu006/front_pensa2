@@ -1,0 +1,588 @@
+/* ANGULAR LOGIN COMPONENT - RESPONSIVE CSS OPTIMIZADO */
+
+/* Reset y configuración del host */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Mantener siempre centrado */
+  min-height: 100vh;
+  width: 100%;
+  padding: clamp(0.5rem, 2vw, 2rem);
+  background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #2a3441 100%);
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+  animation: fadeIn 0.6s ease-out;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: clamp(280px, 90vw, 420px);
+  text-align: center;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 2rem);
+  background: rgba(26, 35, 50, 0.85);
+  backdrop-filter: blur(20px);
+  border-radius: clamp(12px, 3vw, 20px);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #8b5cf6 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+.logo {
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-weight: 300;
+  letter-spacing: clamp(0.15em, 0.5vw, 0.3em);
+  color: #e1e8f0;
+  margin-bottom: clamp(1rem, 3vw, 2rem);
+  text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+  animation: fadeIn 0.8s ease-out 0.2s both;
+  line-height: 1.1;
+}
+
+.login-title {
+  font-size: clamp(1.125rem, 4vw, 1.5rem);
+  font-weight: 500;
+  color: #e1e8f0;
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  animation: fadeIn 0.8s ease-out 0.4s both;
+}
+
+.form-group {
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+  text-align: left;
+  animation: fadeIn 0.8s ease-out 0.6s both;
+  
+  &:last-of-type {
+    animation-delay: 0.8s;
+  }
+}
+
+.form-label {
+  display: block;
+  color: #9ca3af;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  font-weight: 500;
+  margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+  transition: color 0.3s ease;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: clamp(0.75rem, 3vw, 1rem) clamp(1rem, 3vw, 1.25rem);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(8px, 2vw, 12px);
+  font-size: clamp(16px, 3vw, 1rem); /* 16px mínimo para evitar zoom en iOS */
+  background: rgba(255, 255, 255, 0.03);
+  color: #e1e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  
+  &::placeholder {
+    color: #6b7280;
+    font-style: italic;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 
+      0 0 0 3px rgba(59, 130, 246, 0.1),
+      0 4px 20px rgba(59, 130, 246, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-1px);
+    
+    &::placeholder {
+      opacity: 0.7;
+    }
+    
+    + .password-toggle,
+    ~ .form-label {
+      color: #3b82f6;
+    }
+  }
+  
+  &.has-icon {
+    padding-right: clamp(2.5rem, 8vw, 3rem);
+  }
+  
+  &.error {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+  
+  &.success {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: clamp(0.5rem, 2vw, 1rem);
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: clamp(4px, 1.5vw, 8px);
+  border-radius: clamp(6px, 2vw, 8px);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(30px, 8vw, 36px);
+  height: clamp(30px, 8vw, 36px);
+  z-index: 2;
+  
+  &:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(1.1);
+  }
+  
+  &:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+.eye-icon {
+  font-size: clamp(14px, 4vw, 18px);
+  transition: transform 0.3s ease;
+}
+
+.btn-login {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: clamp(0.875rem, 3vw, 1.125rem) clamp(1.5rem, 4vw, 2rem);
+  width: 100%;
+  border: none;
+  border-radius: clamp(8px, 2vw, 12px);
+  font-size: clamp(0.95rem, 3vw, 1.05rem);
+  font-weight: 600;
+  margin-top: clamp(1.25rem, 4vw, 2rem);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 20px rgba(59, 130, 246, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+  min-height: clamp(44px, 10vw, 52px);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.8s ease-out 1s both;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+      0 8px 30px rgba(59, 130, 246, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.1);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 20px rgba(59, 130, 246, 0.3),
+      0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    
+    &::before {
+      display: none;
+    }
+  }
+  
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: clamp(16px, 4vw, 18px);
+  height: clamp(16px, 4vw, 18px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: clamp(0.8rem, 2.5vw, 0.875rem);
+  margin-top: clamp(0.75rem, 2vw, 1rem);
+  padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: clamp(6px, 2vw, 8px);
+  text-align: center;
+  line-height: 1.4;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.success-message {
+  color: #10b981;
+  font-size: clamp(0.8rem, 2.5vw, 0.875rem);
+  margin-top: clamp(0.75rem, 2vw, 1rem);
+  padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: clamp(6px, 2vw, 8px);
+  text-align: center;
+  line-height: 1.4;
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== RESPONSIVE OPTIMIZADO CON CONTAINER QUERIES ========== */
+
+/* Pantallas muy pequeñas - MANTENER CENTRADO */
+@media (max-width: 320px) {
+  :host {
+    /* Mantener centrado vertical y horizontal */
+    justify-content: center;
+    align-items: center;
+    padding: clamp(0.5rem, 2vw, 1rem);
+  }
+  
+  .container {
+    margin: 0;
+    border-radius: 8px;
+    /* Reducir padding interno para pantallas muy pequeñas */
+    padding: clamp(1rem, 4vw, 1.5rem) clamp(0.75rem, 3vw, 1.25rem);
+  }
+  
+  .logo {
+    letter-spacing: 0.1em;
+  }
+}
+
+/* Móviles pequeños - MANTENER CENTRADO */
+@media (max-width: 480px) {
+  :host {
+    /* Mantener centrado en todas las dimensiones */
+    justify-content: center;
+    align-items: center;
+    padding: clamp(0.5rem, 2vw, 1rem);
+  }
+  
+  .container {
+    margin: 0;
+  }
+}
+
+/* Tablets en portrait */
+@media (min-width: 481px) and (max-width: 768px) {
+  .container {
+    max-width: min(90vw, 400px);
+  }
+}
+
+/* Tablets en landscape y desktop pequeño */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    max-width: min(60vw, 450px);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .container {
+    max-width: min(40vw, 480px);
+  }
+}
+
+/* ========== ORIENTACIÓN Y ALTURA - CENTRADO MEJORADO ========== */
+
+/* Landscape en móviles y tablets - MANTENER CENTRADO */
+@media (orientation: landscape) and (max-height: 600px) {
+  :host {
+    /* Mantener centrado incluso en landscape */
+    justify-content: center;
+    align-items: center;
+    padding: clamp(0.5rem, 2vh, 1rem);
+    /* Solo usar scroll si es absolutamente necesario */
+    overflow-y: auto;
+  }
+  
+  .container {
+    margin: 0;
+    padding: clamp(1rem, 3vh, 1.5rem) clamp(1.5rem, 4vw, 2rem);
+    /* Asegurar que no se desborde */
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .logo {
+    font-size: clamp(1.5rem, 4vh, 2rem);
+    margin-bottom: clamp(0.5rem, 2vh, 1rem);
+  }
+  
+  .login-title {
+    font-size: clamp(1rem, 3vh, 1.25rem);
+    margin-bottom: clamp(1rem, 3vh, 1.5rem);
+  }
+  
+  .form-group {
+    margin-bottom: clamp(0.75rem, 2vh, 1rem);
+  }
+  
+  .btn-login {
+    margin-top: clamp(1rem, 3vh, 1.5rem);
+    min-height: clamp(40px, 8vh, 48px);
+  }
+}
+
+/* Alturas muy pequeñas - CENTRADO CON SCROLL INTERNO */
+@media (max-height: 500px) {
+  :host {
+    /* Mantener centrado */
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+  }
+  
+  .container {
+    padding: 1rem 1.5rem;
+    /* Permitir scroll interno si es necesario */
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  .btn-login {
+    margin-top: 1rem;
+    min-height: 40px;
+  }
+}
+
+/* ========== SAFE AREAS (iOS) ========== */
+@supports (padding: max(0px)) {
+  :host {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* ========== PREFERENCIAS DE ACCESIBILIDAD ========== */
+
+/* Movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .container::before {
+    animation: none;
+  }
+  
+  .btn-login::before {
+    display: none;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .container {
+    border: 2px solid #ffffff;
+    background: rgba(0, 0, 0, 0.95);
+  }
+  
+  .input {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .logo,
+  .login-title,
+  .form-label {
+    color: #ffffff;
+  }
+}
+
+/* Tema oscuro preferido */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: rgba(15, 20, 25, 0.95);
+  }
+}
+
+/* ========== HOVER EFFECTS PARA DISPOSITIVOS COMPATIBLES ========== */
+@media (hover: hover) and (pointer: fine) {
+  .input:hover:not(:focus) {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .password-toggle:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(1.1);
+  }
+}
+
+/* ========== CLASES UTILITARIAS ========== */
+.hidden {
+  display: none !important;
+}
+
+.show {
+  display: block !important;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ========== FIXES ESPECÍFICOS DE NAVEGADORES ========== */
+
+/* WebKit (Safari, Chrome en iOS) */
+@supports (-webkit-touch-callout: none) {
+  .input {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  .btn-login {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+
+/* Firefox */
+@-moz-document url-prefix() {
+  .input {
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  .btn-login {
+    -moz-appearance: none;
+    appearance: none;
+  }
+}

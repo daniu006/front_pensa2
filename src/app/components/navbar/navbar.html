@@ -1,0 +1,12 @@
+<nav class="sara-navbar">
+  <div class="logo-section">
+    <app-logo></app-logo>
+  </div>
+  <button 
+    *ngIf="showLogoutButton" 
+    class="logout-btn logout-btn-desktop" 
+    (click)="onLogout()">
+    Disconnect
+  </button>
+  <span class="user-badge">{{ username }}</span>
+</nav>

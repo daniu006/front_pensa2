@@ -1,0 +1,57 @@
+<div class="container">
+  <app-logo class="logo" />
+  
+  <h1 class="login-title">Welcome</h1>
+
+  <!-- Login Form -->
+  <form (ngSubmit)="onLogin()">
+    <!-- Email Field -->
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <div class="input-wrapper">
+        <input 
+          class="input" 
+          type="email" 
+          placeholder="Enter your email" 
+          [(ngModel)]="usernameOrEmail" 
+          name="email"
+          required />
+      </div>
+    </div>
+
+    <!-- Password Field -->
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-wrapper">
+        <input 
+          class="input has-icon" 
+          [type]="showPassword ? 'text' : 'password'" 
+          placeholder="Enter your password" 
+          [(ngModel)]="password" 
+          name="password"
+          required />
+        
+        <button 
+          type="button" 
+          class="password-toggle" 
+          (click)="togglePasswordVisibility()">
+          <span class="eye-icon">{{ showPassword ? '👁️' : '👁️‍🗨️' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Login Button -->
+    <button 
+      class="btn-login" 
+      type="submit" 
+      [disabled]="isLoading">
+      <span class="loading-spinner" *ngIf="isLoading"></span>
+      {{ isLoading ? 'Signing in...' : 'Sign In' }}
+    </button>
+  </form>
+</div>

@@ -1,0 +1,112 @@
+/* Estilos base para la barra de navegación */
+.sara-navbar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(26, 35, 50, 0.95);
+  backdrop-filter: blur(10px);
+  max-height: 130px;
+  gap: 1rem;
+  padding: 2rem;
+  color: #e1e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.logo-section {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.logo-text {
+  font-size: 2rem;
+  color: #e1e8f0;
+  letter-spacing: 0.15rem;
+  font-weight: 300;
+}
+
+.user-badge {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 0.8rem 2rem;
+  color: #e1e8f0;
+  font-size: 1rem;
+  text-align: center;
+  border-radius: 30px;
+  font-weight: 500;
+  margin-left: auto; 
+  width: 120px;
+  transition: all 0.3s ease;
+}
+
+.user-badge:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Estilos para el botón de desconectar */
+.logout-btn {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+ padding: 0.8rem 1rem;
+  font-size: 1rem;
+  text-align: center;
+  border-radius: 30px;
+  font-weight: 500; 
+  width: 120x;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+
+.logout-btn-desktop {
+  display: flex;
+}
+
+.logout-btn-mobile {
+  display: none;
+}
+
+/* ================================== */
+/* MEDIA QUERY PARA VISTA MÓVIL       */
+/* ================================== */
+@media (max-width: 600px) {
+  /* Centra el contenido de la barra de navegación */
+  .sara-navbar {
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    background: rgba(26, 35, 50, 0.98);
+  }
+  
+  /* Apila el logo y el nombre de usuario verticalmente */
+  .logo-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: auto;
+    margin-bottom: 0;
+  }
+  
+  /* Elimina el margen de la insignia de usuario */
+  .user-badge {
+    margin-left: 0;
+    padding: 0.5rem 1.5rem;
+  }
+  
+  /* Oculta el botón de desconectar de escritorio en la vista móvil */
+  .logout-btn-desktop {
+    display: none;
+  }
+}

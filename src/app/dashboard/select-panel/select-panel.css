@@ -1,0 +1,368 @@
+/* select-panel.component.css */
+
+/* Main container with dashboard background */
+.select-panel-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Container to center everything on screen */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  padding: 20px;
+  box-sizing: border-box; 
+}
+
+/* Centered panel with glassmorphism style */
+.panel {
+  background: rgba(26, 35, 50, 0.6);
+  backdrop-filter: blur(20px);
+  padding: 30px 16px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Large logo */
+.logo {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  user-select: none;
+}
+
+/* Panel title */
+.title {
+  font-style: italic;
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+  color: #e1e8f0;
+}
+
+/* Circular buttons */
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  margin-bottom: 20px;
+
+  /* 🎯 Fondo del arco */
+  background-image: url('/assets/icons/arco.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%; /* o cover si quieres que llene todo */
+  padding: 50px 30px; /* Puedes ajustar para que se vea bien */
+}
+
+
+/* Circular button */
+.circle-btn {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background-color: #555;
+  border: none;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* PRESSED EFFECT */
+.circle-btn.pressed {
+  transform: scale(0.8);
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.6), 
+              0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: none;
+}
+
+/* Shiny animation */
+.circle-btn.shiny {
+  animation: shine 0.6s ease-in-out;
+}
+
+@keyframes shine {
+  0% { box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.7), 2px 2px 8px rgba(0, 0, 0, 0.3); }
+  100% { box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); }
+}
+
+/* Hidden button */
+.circle-btn.button-hiden {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: default;
+  transition: none !important;
+  touch-action: none;
+  visibility: hidden;
+}
+.circle-btn.button-hiden:hover,
+.circle-btn.button-hiden:focus,
+.circle-btn.button-hiden:active,
+.circle-btn.button-hiden.pressed {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Hover only for devices that support it */
+@media (hover: hover) and (pointer: fine) {
+  .circle-btn:hover:not(.button-hiden):not(.locked) {
+    transform: scale(1.1);
+    filter: brightness(1.3);
+  }
+  
+  /* Hover colors for each button position */
+  .circle-btn:nth-child(1):hover:not(.locked) { background-color: #ffc107; } /* Yellow */
+  .circle-btn:nth-child(2):hover:not(.locked) { background-color: #dc3545; } /* Red */
+  .circle-btn:nth-child(3):hover:not(.locked) { background-color: #8b5cf6; } /* Purple */
+  .circle-btn:nth-child(5):hover:not(.locked) { background-color: #32cd32; } /* Lime Green */
+  .circle-btn:nth-child(7):hover:not(.locked) { background-color: #007bff; } /* Blue */
+}
+
+/* ✅ COLORES ACTIVOS ORIGINALES */
+.circle-btn.active.yellow { background-color: #f9d71c; box-shadow: 0 0 15px #f9d71caa; }
+.circle-btn.active.red { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3caa; }
+.circle-btn.active.purple { background-color: #8e44ad; box-shadow: 0 0 15px #8e44adaa; }
+.circle-btn.active.limegreen { background-color: #32cd32; box-shadow: 0 0 15px #32cd32aa; }
+.circle-btn.active.blue { background-color: #3498db; box-shadow: 0 0 15px #3498dbaa; }
+
+/* ✅ NUEVO: COLOR VERDE PARA SESIÓN ACTIVA */
+.circle-btn.active.green { 
+  background-color: #32cd32 !important; 
+  box-shadow: 0 0 20px #32cd32cc, 0 0 30px #32cd3288 !important;
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+/* ✅ ANIMACIÓN DE PULSO VERDE PARA SESIÓN ACTIVA */
+@keyframes pulse-green {
+  0% { 
+    box-shadow: 0 0 15px #32cd32aa, 0 0 25px #32cd3266;
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 25px #32cd32cc, 0 0 35px #32cd3288;
+    transform: scale(1.05);
+  }
+  100% { 
+    box-shadow: 0 0 15px #32cd32aa, 0 0 25px #32cd3266;
+    transform: scale(1);
+  }
+}
+
+/* ✅ ASEGURAR QUE EL VERDE TIENE PRIORIDAD SOBRE OTROS COLORES */
+.circle-btn.active.green:hover {
+  background-color: #28a745 !important;
+  box-shadow: 0 0 25px #28a745cc, 0 0 35px #28a74588 !important;
+}
+
+/* Space between rows */
+.spacer {
+  grid-column: 1 / -1;
+  height: 0;
+}
+
+/* Back button */
+.back-button {
+  margin-top: 2rem;
+  padding: 0.8rem 2rem;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #e1e8f0;
+  font-style: italic;
+  border-radius: 30px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+  width: 120px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+.back-button:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ================================== */
+/* MODIFICATIONS FOR RESPONSIVE VIEW  */
+/* ================================== */
+@media (max-width: 600px) {
+  .container {
+    padding: 0;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .panel-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+  }
+  
+  .panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    box-sizing: border-box;
+    background: rgba(26, 35, 50, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .logo {
+    color: #e1e8f0;
+  }
+
+  .buttons {
+    gap: 2rem 1.5rem;
+  }
+
+  .spacer {
+    display: none;
+  }
+  
+  /* CAMBIO PRINCIPAL: Aplicar el estilo del disconnect button */
+  .back-button {
+    margin-top: 60%;
+    align-self: center;
+    border-radius: 30px;
+    width: 100%;
+    height: 55px;
+    max-width: 220px;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    min-height: 44px;
+    
+    /* Estilos del disconnect button */
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    box-shadow: 
+      0 4px 20px rgba(239, 68, 68, 0.3),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .back-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .back-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+      0 8px 30px rgba(239, 68, 68, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .back-button:hover:not(:disabled)::before {
+    left: 100%;
+  }
+  
+  .back-button:active:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .circle-btn.button-hiden {
+    background-color: transparent !important;
+    visibility: hidden !important;
+  }
+}
+
+/* ✅ ESTILOS PARA BOTONES BLOQUEADOS */
+.circle-btn.locked {
+  background-color: #555 !important;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.circle-btn.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.circle-btn.locked:hover::after {
+  opacity: 1;
+}
+
+/* ✅ HOVER SOLO PARA SPEAKER DISPONIBLE (Speaker 1) */
+@media (hover: hover) and (pointer: fine) {
+  /* Solo Speaker 1 tiene hover cuando no está en sesión activa */
+  .circle-btn[data-speaker-id="1"]:not(.green):hover {
+    background-color: #ffc107 !important;
+    transform: scale(1.1);
+    filter: brightness(1.3);
+  }
+  
+  /* Hover especial para speaker con sesión activa (verde) */
+  .circle-btn.active.green:hover {
+    background-color: #28a745 !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px #28a745dd, 0 0 40px #28a74599 !important;
+  }
+}
+
+/* ✅ INDICADOR VISUAL DE ESTADO EN TIEMPO REAL */
+.circle-btn.active.green::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #00ff00;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #00ff00;
+  animation: blink-indicator 1.5s ease-in-out infinite;
+}
+
+@keyframes blink-indicator {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

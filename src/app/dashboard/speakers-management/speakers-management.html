@@ -1,0 +1,318 @@
+<!-- speakers-management.component.html -->
+<div class="speaker-management-container">
+  <!-- Header -->
+  <header class="page-header">
+  <div class="header-left">
+    <button class="back-btn" routerLink="/dashboard/adminpanel">← Back</button>
+    <h1>🔊 Speaker Management</h1>
+    <!-- NUEVO: Botón logout movido aquí para responsive -->
+    <button class="logout-btn" (click)="logout()">Disconnect</button>
+  </div>
+  <div class="header-right">
+    <!-- Botón logout original (se oculta en responsive) -->
+    <button class="logout-btn" (click)="logout()">Disconnect</button>
+    <button class="create-btn" (click)="openCreateModal()" [disabled]="loading">+ Add Speaker</button>
+  </div>
+</header>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-banner">
+    <div class="error-content">
+      <span class="error-icon">⚠️</span>
+      <span class="error-message">{{ error }}</span>
+      <button class="error-close" (click)="clearError()">×</button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading && speakers.length === 0" class="speakers-container">
+    <div class="speakers-header">
+      <h2>Loading speakers...</h2>
+    </div>
+  </div>
+
+  <!-- Speakers List -->
+  <div *ngIf="!loading || speakers.length > 0" class="speakers-container">
+    <div class="speakers-header">
+      <h2>Speakers ({{ speakers.length }})</h2>
+      <!-- NUEVO: Botón Add Speaker en speakers-header para responsive -->
+      <button class="create-btn" (click)="openCreateModal()" [disabled]="loading">+ Add Speaker</button>
+    </div>
+
+    <div class="speakers-grid" *ngIf="speakers.length > 0">
+      <!-- Speaker Card Dynamic -->
+      <div *ngFor="let speaker of speakers; let i = index" class="speaker-card">
+        <div class="speaker-visual">
+          <!-- CAMBIO: Emoji de parlante con círculo de color -->
+          <div class="speaker-circle" [style.border-color]="getSpeakerColor(i).color">
+            <div class="speaker-emoji">🔊</div>
+          </div>
+          <!-- CAMBIO: Mostrar "Speaker X" y color -->
+          <div class="speaker-color-label">{{ getSpeakerColor(i).name }}</div>
+        </div>
+        
+        <div class="speaker-info">
+          <!-- CAMBIO: Mostrar "Speaker X" como nombre -->
+          <div class="speaker-name">Speaker {{ speaker.id }}</div>
+          <div class="speaker-id">ID: {{ speaker.id }}</div>
+          <!-- CAMBIO: Posiciones corregidas -->
+          <div class="speaker-position">Position: {{ getCorrectPosition(speaker.position) }}</div>
+          
+          <div class="speaker-specs">
+            <div class="spec-item">
+              Total Sessions: {{ getTotalSessions(speaker) }}
+            </div>
+            <div class="spec-item">
+              Total History: {{ getTotalHistories(speaker) }}
+            </div>
+            <div class="spec-item" *ngIf="hasActiveSession(speaker)">
+              🟢 Active Session
+            </div>
+          </div>
+        </div>
+
+        <div class="speaker-status">
+          <div class="status-row">
+            <span class="status-badge" [class.active]="speaker.state">
+              {{ speaker.state ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+          
+          <div class="battery-info">
+            <span class="battery-label">Battery: {{ speaker.batteryPercentage }}%</span>
+            <div class="battery-bar">
+              <div 
+                class="battery-fill" 
+                [ngClass]="getBatteryClass(speaker.batteryPercentage)"
+                [style.width.%]="speaker.batteryPercentage">
+              </div>
+            </div>
+          </div>
+
+          <div class="last-connected">
+            Last update: {{ formatLastConnection(speaker.updatedAt) }}
+          </div>
+        </div>
+
+        <!-- CAMBIO: Botones con el mismo estilo que users-management -->
+        <div class="speaker-actions">
+          <button 
+            class="action-btn edit-btn" 
+            title="Edit speaker"
+            (click)="openEditModal(speaker)"
+            [disabled]="loading">
+            ✏️
+          </button>
+          <button 
+            class="action-btn toggle-btn" 
+            [title]="speaker.state ? 'Deactivate speaker' : 'Activate speaker'"
+            (click)="toggleSpeaker(speaker)"
+            [disabled]="loading">
+            {{ speaker.state ? '🔒' : '🔓' }}
+          </button>
+          <button 
+            class="action-btn delete-btn" 
+            title="Delete speaker"
+            (click)="openDeleteModal(speaker)"
+            [disabled]="loading">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="speakers.length === 0 && !loading" class="empty-state">
+      <div class="empty-icon">🔊</div>
+      <h3>No speakers found</h3>
+      <p>Add your first speaker to get started</p>
+      <button class="create-btn" (click)="openCreateModal()">+ Add Speaker</button>
+    </div>
+
+    <!-- NUEVO: Bottom Buttons Section solo para el botón back en responsive -->
+    <div class="bottom-buttons">
+      <button class="back-btn" routerLink="/dashboard/adminpanel">
+        ← Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Create Speaker Modal -->
+  <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Add New Speaker</h2>
+        <button class="close-btn" (click)="closeCreateModal()">×</button>
+      </div>
+      
+      <form class="speaker-form" (ngSubmit)="createSpeaker()" #createSpeakerForm="ngForm">
+        <div class="form-section">
+          <h3>Speaker Information</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="create-name">Speaker Name *</label>
+              <input 
+                type="text" 
+                id="create-name" 
+                name="createName"
+                [(ngModel)]="createForm.name"
+                placeholder="e.g., Main Hall Speaker" 
+                required />
+              <small>Display name for the speaker</small>
+            </div>
+            <div class="form-group">
+              <label for="create-position">Position *</label>
+              <select 
+                id="create-position" 
+                name="createPosition"
+                [(ngModel)]="createForm.position"
+                required>
+                <option value="">Select position</option>
+                <option *ngFor="let position of availablePositions" [value]="position">{{ position }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Initial Settings</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="create-battery">Battery Percentage</label>
+              <input 
+                type="number" 
+                id="create-battery" 
+                name="createBattery"
+                [(ngModel)]="createForm.batteryPercentage"
+                placeholder="100" 
+                min="0" 
+                max="100" />
+              <small>Initial battery level (0-100%)</small>
+            </div>
+            <div class="form-group">
+              <label for="create-state">Initial State</label>
+              <select 
+                id="create-state" 
+                name="createState"
+                [(ngModel)]="createForm.state">
+                <option [value]="false">Inactive</option>
+                <option [value]="true">Active</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeCreateModal()" [disabled]="loading">Cancel</button>
+          <button type="submit" class="submit-btn" [disabled]="!createSpeakerForm.form.valid || loading">
+            {{ loading ? 'Creating...' : 'Add Speaker' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Speaker Modal -->
+  <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Edit Speaker</h2>
+        <button class="close-btn" (click)="closeEditModal()">×</button>
+      </div>
+      
+      <form class="speaker-form" (ngSubmit)="updateSpeaker()" #editSpeakerForm="ngForm">
+        <div class="form-section">
+          <h3>Speaker Information</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-name">Speaker Name *</label>
+              <input 
+                type="text" 
+                id="edit-name" 
+                name="editName"
+                [(ngModel)]="editForm.name"
+                placeholder="e.g., Main Hall Speaker" 
+                required />
+              <small>Display name for the speaker</small>
+            </div>
+            <div class="form-group">
+              <label for="edit-position">Position *</label>
+              <select 
+                id="edit-position" 
+                name="editPosition"
+                [(ngModel)]="editForm.position"
+                required>
+                <option value="">Select position</option>
+                <option *ngFor="let position of availablePositions" [value]="position">{{ position }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Speaker Settings</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-battery">Battery Percentage</label>
+              <input 
+                type="number" 
+                id="edit-battery" 
+                name="editBattery"
+                [(ngModel)]="editForm.batteryPercentage"
+                min="0" 
+                max="100" />
+              <small>Current battery level (0-100%)</small>
+            </div>
+            <div class="form-group">
+              <label for="edit-state">Status</label>
+              <div class="checkbox-container">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    id="edit-state" 
+                    name="editState"
+                    [(ngModel)]="editForm.state">
+                  <span>Speaker is active</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeEditModal()" [disabled]="loading">Cancel</button>
+          <button type="submit" class="submit-btn" [disabled]="!editSpeakerForm.form.valid || loading">
+            {{ loading ? 'Updating...' : 'Update Speaker' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content small-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Delete Speaker</h2>
+        <button class="close-btn" (click)="closeDeleteModal()">×</button>
+      </div>
+      
+      <div class="delete-content">
+        <div class="warning-icon">⚠️</div>
+        <p *ngIf="selectedSpeaker">Are you sure you want to delete <strong>Speaker {{ selectedSpeaker.id }}</strong>?</p>
+        <p class="warning-text">This action cannot be undone and all associated data will be lost.</p>
+        
+        <div class="modal-actions">
+          <button class="cancel-btn" (click)="closeDeleteModal()" [disabled]="loading">Cancel</button>
+          <button class="delete-btn" (click)="confirmDelete()" [disabled]="loading">
+            {{ loading ? 'Deleting...' : 'Delete Speaker' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

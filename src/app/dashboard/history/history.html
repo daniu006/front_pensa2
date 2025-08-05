@@ -1,0 +1,255 @@
+<!-- Add navbar at the beginning -->
+<app-navbar>
+</app-navbar>
+
+<div class="app-container">
+  <div class="history-wrapper">
+    <h2 class="title">Usage History</h2>
+
+    <!-- Refresh button -->
+    <div class="actions-bar">
+      <button class="refresh-button" (click)="refreshHistory()" [disabled]="loading">
+        <span *ngIf="loading">🔄</span>
+        {{ loading ? 'Loading...' : 'Refresh' }}
+      </button>
+      <!-- 🔥 BOTÓN DE DEBUG SOLO EN DESARROLLO -->
+      <button 
+        style="padding: 12px 24px; border-radius: 20px; background: linear-gradient(45deg, #f59e0b, #fbbf24); color: white; border: none; font-weight: 500; cursor: pointer; font-size: 14px;"
+        (click)="debugHistoryData()"
+        *ngIf="false">
+        🔍 Debug Data
+      </button>
+    </div>
+
+    <!-- Filters Container -->
+    <div class="filter-container">
+      <!-- Speaker ID Filter Row -->
+      <div class="filter-row">
+        <input 
+          type="number" 
+          class="filter-input" 
+          placeholder="Filter by Speaker ID..." 
+          [value]="speakerIdFilter || ''"
+          (input)="onFilterInput($event)"
+          min="1">
+        
+        <!-- Date Filter Button -->
+        <button 
+          class="date-filter-button"
+          (click)="toggleCalendar()"
+          [class.active]="showCalendar">
+          📅 {{ selectedDate ? 'Date: ' + dateFilter : 'Select Date' }}
+        </button>
+
+        <!-- Clear All Filters Button -->
+        <button 
+          class="clear-filter-button" 
+          (click)="clearAllFilters()"
+          *ngIf="hasActiveFilters">
+          Clear All
+        </button>
+      </div>
+
+      <!-- Calendar Overlay (Desktop only) -->
+      <div class="calendar-overlay" *ngIf="showCalendar" (click)="toggleCalendar()"></div>
+
+      <!-- Calendar Widget -->
+      <div class="calendar-container" *ngIf="showCalendar" (click)="$event.stopPropagation()">
+        <div class="calendar-header">
+          <button class="calendar-nav-button" (click)="previousMonth()">‹</button>
+          <h3 class="calendar-month-year">{{ currentMonthYear }}</h3>
+          <button class="calendar-nav-button" (click)="nextMonth()">›</button>
+          <button class="calendar-close-button" (click)="toggleCalendar()" title="Close Calendar">×</button>
+        </div>
+        
+        <div class="calendar-weekdays">
+          <div class="calendar-weekday">Sun</div>
+          <div class="calendar-weekday">Mon</div>
+          <div class="calendar-weekday">Tue</div>
+          <div class="calendar-weekday">Wed</div>
+          <div class="calendar-weekday">Thu</div>
+          <div class="calendar-weekday">Fri</div>
+          <div class="calendar-weekday">Sat</div>
+        </div>
+        
+        <div class="calendar-days">
+          <div 
+            *ngFor="let day of calendarDays"
+            class="calendar-day"
+            [class.current-month]="day.isCurrentMonth"
+            [class.today]="day.isToday"
+            [class.selected]="day.isSelected"
+            [class.has-history]="day.hasHistory"
+            [class.clickable]="day.isCurrentMonth"
+            (click)="selectDate(day)"
+            [title]="day.hasHistory ? day.historyCount + ' record(s) on this date' : ''">
+            
+            <span class="day-number">{{ day.day }}</span>
+            <span class="history-indicator" *ngIf="day.hasHistory">
+              {{ day.historyCount }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick Date Actions -->
+        <div class="calendar-actions">
+          <button class="quick-date-button" (click)="clearDateFilter()" *ngIf="selectedDate">
+            Clear Date Filter
+          </button>
+        </div>
+      </div>
+      
+      <!-- Active Filters Information -->
+      <div class="filter-info" *ngIf="speakerIdFilter && !selectedDate">
+        Showing history for Speaker ID: {{ speakerIdFilter }}
+        ({{ filteredHistoryItems.length }} record{{ filteredHistoryItems.length !== 1 ? 's' : '' }})
+      </div>
+      
+      <div class="filter-info" *ngIf="selectedDate && !speakerIdFilter">
+        Showing history for {{ dateFilter }}
+        ({{ filteredHistoryItems.length }} record{{ filteredHistoryItems.length !== 1 ? 's' : '' }})
+      </div>
+      
+      <div class="filter-info" *ngIf="speakerIdFilter && selectedDate">
+        Showing history for Speaker ID: {{ speakerIdFilter }} on {{ dateFilter }}
+        ({{ filteredHistoryItems.length }} record{{ filteredHistoryItems.length !== 1 ? 's' : '' }})
+      </div>
+      
+      <div class="filter-info" *ngIf="!speakerIdFilter && !selectedDate && !loading">
+        Showing all histories ({{ filteredHistoryItems.length }} record{{ filteredHistoryItems.length !== 1 ? 's' : '' }})
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div class="error-message" *ngIf="error">
+      <p>{{ error }}</p>
+      <button (click)="refreshHistory()" class="retry-button">Retry</button>
+    </div>
+
+    <!-- Loading spinner -->
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading history...</p>
+    </div>
+
+    <!-- History list -->
+    <div class="history-list" *ngIf="!loading">
+      <div class="history-item" 
+           *ngFor="let item of filteredHistoryItems; let i = index" 
+           (click)="toggleItem(i)"
+           [class.expanded]="expandedIndex === i">
+        
+        <!-- 🔥 VISTA RESUMIDA - SOLO DATOS BÁSICOS -->
+        <div class="summary">
+          <p class="title">{{ item.speakerName }}</p>
+          <p class="position">{{ item.speakerPosition }}</p>
+          <p class="speaker-id">
+            <strong>Speaker ID:</strong> <span>#{{ item.speakerId }}</span>
+          </p>
+          <p class="timestamp">{{ item.startDate }} - {{ item.endDate }}</p>
+          <p class="user" *ngIf="item.username">
+            <strong>User:</strong> <span>{{ item.username }}</span>
+          </p>
+          <p class="duration" *ngIf="item.durationMinutes !== null">
+            <strong>Duration:</strong> <span>{{ item.durationMinutes }}m</span>
+          </p>
+        </div>
+        
+        <div class="arrow">{{ expandedIndex === i ? '▲' : '▼' }}</div>
+
+        <!-- 🔥 DETALLES COMPLETOS - SOLO SE MUESTRAN AL EXPANDIR -->
+        <div class="details" *ngIf="expandedIndex === i">
+          <!-- Battery Information -->
+          <div class="detail-section">
+            <h4>Battery Information</h4>
+            <div class="detail-row">
+              <span class="detail-label">Initial battery:</span>
+              <span class="detail-value">{{ item.initialBatteryPercentage || 0 }}%</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Final battery:</span>
+              <span class="detail-value">{{ item.finalBatteryPercentage || 0 }}%</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Battery consumed:</span>
+              <span class="detail-value">{{ item.batteryConsumed || 0 }}%</span>
+            </div>
+          </div>
+
+          <!-- Average Measurements -->
+          <div class="detail-section">
+            <h4>Average Measurements</h4>
+            <div class="detail-row">
+              <span class="detail-label">Average current:</span>
+              <span class="detail-value">{{ (item.avgCurrent_mA || 0).toFixed(2) }} mA</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Average voltage:</span>
+              <span class="detail-value">{{ (item.avgVoltage_V || 0).toFixed(2) }} V</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Average power:</span>
+              <span class="detail-value">{{ (item.avgPower_mW || 0).toFixed(2) }} mW</span>
+            </div>
+          </div>
+
+          <!-- Totals -->
+          <div class="detail-section">
+            <h4>Total Consumption</h4>
+            <div class="detail-row">
+              <span class="detail-label">Total current:</span>
+              <span class="detail-value">{{ (item.totalCurrent_mA || 0).toFixed(2) }} mA</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Total voltage:</span>
+              <span class="detail-value">{{ (item.totalVoltage_V || 0).toFixed(2) }} V</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Total power:</span>
+              <span class="detail-value">{{ (item.totalPower_mW || 0).toFixed(2) }} mW</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Total consumed:</span>
+              <span class="detail-value">{{ (item.totalConsumed_mAh || 0).toFixed(2) }} mAh</span>
+            </div>
+          </div>
+
+          <!-- Session Information -->
+          <div class="detail-section">
+            <h4>Session Information</h4>
+            <div class="detail-row">
+              <span class="detail-label">Session ID:</span>
+              <span class="detail-value">#{{ item.usageSessionId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Speaker ID:</span>
+              <span class="detail-value">#{{ item.speakerId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Created at:</span>
+              <span class="detail-value">{{ item.createdAt }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message when no data -->
+      <div class="no-data" *ngIf="filteredHistoryItems.length === 0 && !loading">
+        <p *ngIf="speakerIdFilter && selectedDate">
+          No history available for Speaker ID: {{ speakerIdFilter }} on {{ dateFilter }}
+        </p>
+        <p *ngIf="speakerIdFilter && !selectedDate">
+          No history available for Speaker ID: {{ speakerIdFilter }}
+        </p>
+        <p *ngIf="!speakerIdFilter && selectedDate">
+          No history available for {{ dateFilter }}
+        </p>
+        <p *ngIf="!speakerIdFilter && !selectedDate">
+          No history available
+        </p>
+      </div>
+    </div>
+
+    <button routerLink="/home" class="back-button">← Back</button>
+  </div>
+</div>

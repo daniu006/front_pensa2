@@ -1,0 +1,41 @@
+:host {
+  display: inline-block; /* para que no ocupe todo el alto ni ancho */
+  height: 122.4px; /* igual que tu SVG */
+  font-family: 'Bebas Neue', sans-serif;
+  background: transparent; /* sin fondo */
+  margin: 0;
+  padding: 0;
+}
+
+.splash-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: 0.5rem; /* espacio pequeño entre letras */
+}
+
+.letter-block {
+  font-size: 4rem; /* tamaño proporcional para 122px alto */
+  font-weight: bold;
+  text-align: center;
+  animation: none !important; /* quitar animaciones */
+}
+
+/* Línea separadora */
+.separator {
+  width: 2px;
+  height: 3rem; /* proporcionado para tamaño */
+  background-color: #eeeeee;
+}
+
+/* Colores */
+.color-blue {
+  color: #c4c4c4;
+}
+
+.gradient {
+  background: linear-gradient(to bottom, #A0A0A0, #3A3A3A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

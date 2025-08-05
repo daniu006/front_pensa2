@@ -1,0 +1,60 @@
+<!-- select-panel.component.html -->
+<div class="select-panel-container">
+  <app-navbar></app-navbar>
+
+  <div class="container">
+    <div class="panel">
+      <div class="panel-content">
+        <div class="title">Control Panel</div>
+        <div class="buttons">
+          
+          <!-- Speaker 1 - Dinámico (Amarillo normal / Verde con sesión activa) -->
+          <button class="circle-btn"
+                  [class.active]="true"
+                  [class.yellow]="!hasSpeakerActiveSession(1)"
+                  [class.green]="hasSpeakerActiveSession(1)"
+                  (pointerdown)="onButtonDown($event, getSpeakerCurrentColor(1))"
+                  (pointerup)="onButtonUp($event)"
+                  (pointerleave)="onButtonLeave($event)"
+                  data-speaker-id="1"
+                  [title]="hasSpeakerActiveSession(1) ? 'Speaker 1 - Active Session' : 'Speaker 1 - Available'">
+          </button>
+
+          <!-- Speaker 2 - Locked -->
+          <button class="circle-btn locked"
+                  data-speaker-id="2"
+                  title="🔒 Locked"
+                  disabled>
+          </button>
+
+          <!-- Speaker 3 - Locked -->
+          <button class="circle-btn locked"
+                  data-speaker-id="3"
+                  title="🔒 Locked"
+                  disabled>
+          </button>
+
+          <div class="spacer"></div>
+
+          <!-- Speaker 4 - Locked -->
+          <button class="circle-btn locked"
+                  data-speaker-id="4"
+                  title="🔒 Locked"
+                  disabled>
+          </button>
+
+          <!-- Hidden spacer -->
+          <button class="circle-btn button-hiden" disabled></button>
+
+          <!-- Speaker 5 - Locked -->
+          <button class="circle-btn locked move-right"
+                  data-speaker-id="5"
+                  title="🔒 Locked"
+                  disabled>
+          </button>
+        </div>
+
+      <button class="back-button" routerLink="/home">Back</button>
+    </div>
+  </div>
+</div>

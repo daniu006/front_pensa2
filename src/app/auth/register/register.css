@@ -1,0 +1,155 @@
+section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+  animation: fadeIn 0.5s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+h1 {
+  text-align: left;
+  font-size: 30px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+/* Contenedor principal */
+.container {
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+  padding: 40px 20px;
+  margin: 0 auto;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: transparent; /* Cambia a blanco si quieres fondo */
+}
+
+/* Para pantallas medianas y grandes */
+@media (min-width: 768px) {
+  .container {
+    max-width: 500px;
+    padding: 60px 40px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.container input,
+.container button,
+.container p,
+.container div,
+.container label,
+.container form {
+  font-family: inherit;
+  font-size: inherit;
+  box-sizing: border-box;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 5px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+label {
+  display: block;
+  font-style: normal;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #000;
+  font-size: 23px;
+}
+
+.input {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #000;
+  border-radius: 10px;
+  font-style: italic;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.white-bg {
+  background-color: white;
+}
+
+/* Botones */
+.btn-black, .btn-google {
+  background-color: black;
+  color: white;
+  padding: 16px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-black:active,
+.btn-google:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Texto "olvidé contraseña" u otros mensajes */
+.forgot {
+  text-align: left;
+  font-size: 18px;
+  color: #000;
+  margin-bottom: 15px;
+  font-family: inherit;
+}
+
+/* Texto de registro */
+.signup {
+  margin-top: 20px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.signup b {
+  font-style: normal;
+}
+
+/* Links con efecto subrayado */
+.underline-hover {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+
+.underline-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease-in-out;
+}
+
+.underline-hover:hover::after {
+  transform: scaleX(1);
+}

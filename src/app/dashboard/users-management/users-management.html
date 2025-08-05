@@ -1,0 +1,269 @@
+<div class="user-management-container">
+  <header class="page-header">
+    <div class="header-left">
+      <button class="back-btn" routerLink="/dashboard/adminpanel">← Back</button>
+      <h1>👥 User Management</h1>
+      <!-- NUEVO: Botón logout movido aquí para responsive (oculto en desktop) -->
+      <button class="logout-btn" (click)="logout()" style="display: none;">Disconnect</button>
+    </div>
+    <div class="header-right">
+      <!-- Solo botón logout en header-right para desktop -->
+      <button class="logout-btn" (click)="logout()">Disconnect</button>
+      <!-- CAMBIO: Ocultar Create User del header-right en desktop -->
+    </div>
+  </header>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-banner">
+    <div class="error-content">
+      <span class="error-icon">⚠️</span>
+      <span class="error-message">{{ error }}</span>
+      <button class="error-close" (click)="clearError()">×</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading users...</p>
+  </div>
+
+  <div *ngIf="!loading" class="users-container">
+    <!-- CAMBIO: Users header igual que speakers-header -->
+    <div class="users-header">
+      <h2>
+        System Users 
+        <span class="user-count">
+          <span *ngIf="!isFiltered">({{ totalUserCount }})</span>
+          <span *ngIf="isFiltered">({{ displayedUserCount }} of {{ totalUserCount }})</span>
+        </span>
+      </h2>
+      <!-- CAMBIO: Header actions igual que en speakers-header -->
+      <div class="header-actions">
+        <button class="create-btn" (click)="openCreateModal()" [disabled]="loading">+ Create User</button>
+        <button class="refresh-btn" (click)="loadUsers()" title="Refresh users list">🔄</button>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search users by username or email..." 
+            [(ngModel)]="searchTerm" 
+            (input)="onSearchChange()"
+          >
+          <button 
+            *ngIf="searchTerm" 
+            class="clear-search-btn" 
+            (click)="clearSearch()" 
+            title="Clear search"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+      
+      <div class="filter-container">
+        <select 
+          class="filter-select" 
+          [(ngModel)]="filterBy" 
+          (change)="onFilterByChange()"
+        >
+          <option value="all">Search in all fields</option>
+          <option value="username">Username only</option>
+          <option value="email">Email only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Results info -->
+    <div class="search-results-info" *ngIf="isFiltered">
+      <p *ngIf="displayedUserCount > 0">
+        Showing {{ displayedUserCount }} user{{ displayedUserCount !== 1 ? 's' : '' }} 
+        {{ searchTerm ? 'matching "' + searchTerm + '"' : '' }}
+        {{ filterBy !== 'all' ? ' in ' + filterBy : '' }}
+      </p>
+      <p *ngIf="displayedUserCount === 0" class="no-results">
+        No users found matching your search criteria
+      </p>
+    </div>
+
+    <div class="users-grid" *ngIf="filteredUsers.length > 0">
+      <div class="user-card" *ngFor="let user of filteredUsers">
+        <div class="user-avatar">{{ getUserAvatar(user) }}</div>
+        
+        <div class="user-info">
+          <div class="user-name">{{ user.firstName || user.username }} {{ user.lastName || '' }}</div>
+          <div class="user-username" [class.highlight]="filterBy === 'all' || filterBy === 'username'">{{ user.username }}</div>
+          <div class="user-email" [class.highlight]="filterBy === 'all' || filterBy === 'email'">{{ user.email }}</div>
+          <div class="user-role">{{ user.role }}</div>
+          <div class="user-created">Created: {{ user.createdAt | date:'short' }}</div>
+        </div>
+
+        <div class="user-status">
+          <span class="status-badge" [class.active]="user.isActive">
+            {{ user.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+
+        <div class="user-actions">
+          <button class="action-btn edit-btn" (click)="editUser(user)" [disabled]="loading" title="Edit user">✏️</button>
+          <button class="action-btn toggle-btn" (click)="toggleUser(user)" [disabled]="loading" [title]="user.isActive ? 'Deactivate user' : 'Activate user'">{{ user.isActive ? '🔒' : '🔓' }}</button>
+          <button class="action-btn delete-btn" (click)="deleteUser(user)" [disabled]="loading" title="Delete user">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty states -->
+    <div *ngIf="users.length === 0 && !loading" class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h3>No users found</h3>
+      <p>Create the first user to get started</p>
+      <button class="create-btn" (click)="openCreateModal()">+ Create User</button>
+    </div>
+
+    <div *ngIf="users.length > 0 && filteredUsers.length === 0 && isFiltered" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No users match your search</h3>
+      <p>Try adjusting your search criteria or filter settings</p>
+      <button class="clear-search-btn-large" (click)="clearSearch()">Clear Search</button>
+    </div>
+
+    <!-- NUEVO: Bottom Buttons Section solo para el botón back en responsive -->
+    <div class="bottom-buttons">
+      <button class="back-btn" routerLink="/dashboard/adminpanel">
+        ← Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Create User Modal -->
+  <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create New User</h2>
+        <button class="close-btn" (click)="closeCreateModal()">×</button>
+      </div>
+      
+      <form class="user-form" (ngSubmit)="createUser()" #createUserForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Username *</label>
+            <input type="text" id="username" name="username" [(ngModel)]="createForm.username" required placeholder="Enter username">
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" [(ngModel)]="createForm.email" required placeholder="Enter email">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" [(ngModel)]="createForm.password" required placeholder="Enter password" minlength="6">
+          </div>
+          
+          <div class="form-group">
+            <label for="role">Role *</label>
+            <select id="role" name="role" [(ngModel)]="createForm.role" required>
+              <option value="">Select role</option>
+              <option value="SUPERADMIN">Super Admin</option>
+              <option value="ADMIN">Administrator</option>
+              <option value="USER">User</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="!createUserForm.form.valid || loading">
+            {{ loading ? 'Creating...' : 'Create User' }}
+          </button>
+          <button type="button" class="btn-secondary" (click)="closeCreateModal()" [disabled]="loading">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Edit User</h2>
+        <button class="close-btn" (click)="closeEditModal()">×</button>
+      </div>
+      
+      <form class="user-form" (ngSubmit)="updateUser()" #editUserForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editUsername">Username *</label>
+            <input type="text" id="editUsername" name="editUsername" [(ngModel)]="editForm.username" required placeholder="Enter username">
+          </div>
+          
+          <div class="form-group">
+            <label for="editEmail">Email *</label>
+            <input type="email" id="editEmail" name="editEmail" [(ngModel)]="editForm.email" required placeholder="Enter email">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editRole">Role *</label>
+            <select id="editRole" name="editRole" [(ngModel)]="editForm.role" required>
+              <option value="">Select role</option>
+              <option value="SUPERADMIN">SUPERADMIN</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="USER">USER</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="isActive">Status</label>
+            <div class="checkbox-container">
+              <label class="checkbox-label">
+                <input type="checkbox" 
+                       id="isActive" 
+                       name="isActive" 
+                       [(ngModel)]="editForm.isActive">
+                <span>User is active</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="!editUserForm.form.valid || loading">
+            {{ loading ? 'Updating...' : 'Update User' }}
+          </button>
+          <button type="button" class="btn-secondary" (click)="closeEditModal()" [disabled]="loading">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete User Modal -->
+  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content small-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Delete User</h2>
+        <button class="close-btn" (click)="closeDeleteModal()">×</button>
+      </div>
+      
+      <div class="delete-content">
+        <div class="warning-icon">⚠️</div>
+        <p *ngIf="selectedUser">Are you sure you want to delete user <strong>{{ selectedUser.username }}</strong>?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+        
+        <div class="form-actions">
+          <button class="btn-danger" (click)="confirmDelete()" [disabled]="loading">
+            {{ loading ? 'Deleting...' : 'Delete' }}
+          </button>
+          <button class="btn-secondary" (click)="closeDeleteModal()" [disabled]="loading">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

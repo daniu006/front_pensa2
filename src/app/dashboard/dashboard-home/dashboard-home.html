@@ -1,0 +1,37 @@
+<div class="sara-dashboard futuristic">
+  <app-navbar>
+  </app-navbar>
+
+  <main class="sara-content column-layout">
+    <!-- Control Panel - Visible para todos los usuarios -->
+    <div class="widget-card big-card" routerLink="/dashboard/select-panel">
+      <div class="widget-icon">
+        <img class="icon" src="assets/icons/control-panel.svg" alt="Control Icon">
+      </div>
+      <div class="widget-label">Control Panel</div>
+    </div>
+
+    <!-- History - Visible para todos los usuarios -->
+    <div class="widget-card big-card" routerLink="/dashboard/history">
+      <div class="widget-icon">
+        <img class="icon" src="assets/icons/history.svg" alt="History" />
+      </div>
+      <div class="widget-label">History</div>
+    </div>
+
+    <!-- Advanced Settings - Solo visible para SUPERADMIN -->
+    <div 
+      class="widget-card big-card" 
+      routerLink="/dashboard/adminpanel"
+      *ngIf="isSuperAdmin()">
+      <div class="widget-icon">
+        <img class="icon" src="assets/icons/settings.svg" alt="Advanced Settings" />
+      </div>
+      <div class="widget-label">Advanced Settings</div>
+    </div>
+  </main>
+
+  <footer class="sara-footer">
+    <button class="logout-btn logout-btn-mobile" (click)="logout()">Disconnect</button>
+  </footer>
+</div>
