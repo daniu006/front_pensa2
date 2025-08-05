@@ -2,6 +2,16 @@
   <app-navbar></app-navbar>
 
   <main class="dashboard-main">
+    
+    <div *ngIf="showScanNotification" class="scan-notification" [ngClass]="'notification-' + (notificationType?.toLowerCase() || '')">
+      <div class="notification-icon">
+        <span *ngIf="notificationType === 'ENTRADA'">✅</span>
+        <span *ngIf="notificationType === 'SALIDA'">🏁</span>
+      </div>
+      <div class="notification-message">
+        {{ notificationMessage }}
+      </div>
+    </div>
     <div class="container">
       
       <div class="welcome-header">

@@ -1134,3 +1134,60 @@
     max-height: 400px;
   }
 }
+
+/* ====================================================== */
+/* =========== INICIO: ESTILOS DE NOTIFICACIÓN ========== */
+/* ====================================================== */
+
+.scan-notification {
+  position: fixed;
+  top: 80px; /* Debajo de la navbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 90%;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #333, #222);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 2000;
+  animation: slide-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translate(-50%, -100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+}
+
+.notification-message {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Colores según el tipo de escaneo */
+.scan-notification.notification-entrada {
+  background: linear-gradient(135deg, #10b981, #059669); /* Verde para entrada */
+}
+
+.scan-notification.notification-salida {
+  background: linear-gradient(135deg, #f59e0b, #d97706); /* Naranja para salida */
+}
+
+/* ====================================================== */
+/* ============ FIN: ESTILOS DE NOTIFICACIÓN ============ */
+/* ====================================================== */

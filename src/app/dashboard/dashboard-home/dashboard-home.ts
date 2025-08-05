@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
 import { Navbar } from '../../components/navbar/navbar';
 import { AuthService } from '../../services/auth.service';
 import { UserService, CreateUserRequest } from '../../services/user.service';
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, switchMap } from 'rxjs';
 
 interface User {
   id: number;
@@ -51,6 +51,14 @@ interface AttendanceStats {
   ultimo_escaneo: string | null;
 }
 
+// Interfaz para la respuesta del polling de notificaciones
+interface ScanNotification {
+  message: string;
+  type: 'ENTRADA' | 'SALIDA';
+  empleado_name: string;
+  timestamp: string;
+}
+
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
@@ -79,6 +87,13 @@ export class DashboardHome implements OnInit, OnDestroy {
   loadingCreateUser = false;
   createUserError: string | null = null;
   
+  // --- Propiedades para Notificaciones ---
+  showScanNotification = false;
+  notificationMessage = '';
+  notificationType: 'ENTRADA' | 'SALIDA' | null = null;
+  private notificationTimeout: any;
+  private pollingSubscription: Subscription | null = null;
+  
   newUserData = {
     name: '',
     email: '',
@@ -106,6 +121,13 @@ export class DashboardHome implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopAutoRefresh();
+    // Detener polling y timeouts para evitar fugas de memoria
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
     this.subscriptions.unsubscribe();
   }
   
@@ -221,6 +243,8 @@ export class DashboardHome implements OnInit, OnDestroy {
         
         this.loadUserQR();
         this.loadAttendanceRecords();
+        // Iniciar el polling después de cargar los datos del usuario
+        this.startPollingForScans();
         
       } catch (e) {
         this.handleAuthError();
@@ -228,6 +252,54 @@ export class DashboardHome implements OnInit, OnDestroy {
     } else {
       this.handleAuthError();
     }
+  }
+  
+  // Nuevo método para iniciar el polling
+  private startPollingForScans(): void {
+    if (!this.user?.id) return;
+
+    // Detener cualquier polling anterior para evitar duplicados
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
+    
+    this.pollingSubscription = interval(5000) // Preguntar cada 5 segundos
+      .pipe(
+        switchMap(() => 
+          this.http.get<ScanNotification | null>(`${this.API_URL}/events/last-scan/${this.user!.id}`)
+        )
+      )
+      .subscribe({
+        next: (notification) => {
+          // Si la respuesta no es nula, significa que hay una nueva notificación
+          if (notification) {
+            console.log('Notificación recibida:', notification);
+            this.showNotification(notification.message, notification.type);
+            // Refrescar los datos para que el dashboard esté actualizado
+            this.refreshAttendance();
+          }
+        },
+        error: (err) => {
+          console.error('Error durante el polling:', err);
+        }
+      });
+  }
+  
+  // Nuevo método para mostrar la notificación en la UI
+  private showNotification(message: string, type: 'ENTRADA' | 'SALIDA'): void {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showScanNotification = true;
+    this.cdr.detectChanges(); // Forzar la actualización de la vista
+
+    // Ocultar la notificación después de 5 segundos
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    this.notificationTimeout = setTimeout(() => {
+      this.showScanNotification = false;
+      this.cdr.detectChanges();
+    }, 5000);
   }
 
   private async loadUserQR(): Promise<void> {
