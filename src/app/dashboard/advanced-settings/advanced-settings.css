@@ -1,13 +1,15 @@
 /* Contenedor principal */
 .admin-dashboard-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+  /* CAMBIO: Gradiente de fondo a tonos morados oscuros */
+  background: linear-gradient(135deg, #2a0a4a 0%, #1e1b4b 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Header */
 .admin-header {
-  background: rgba(26, 35, 50, 0.95);
+  /* CAMBIO: Color del header a un morado profundo con transparencia */
+  background: rgba(109, 40, 217, 0.9);
   backdrop-filter: blur(10px);
   padding: 20px 30px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -36,7 +38,8 @@
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  /* CAMBIO: Color hover a un morado claro */
+  background: rgba(139, 92, 246, 0.1);
   border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
@@ -84,8 +87,9 @@
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
+  /* CAMBIO: Color hover a morado */
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
   transform: translateY(-1px);
 }
 
@@ -104,15 +108,17 @@
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
+  /* CAMBIO: Color hover a fucsia/magenta para logout */
+  background: rgba(236, 72, 153, 0.2);
+  border-color: rgba(236, 72, 153, 0.5);
   transform: translateY(-1px);
 }
 
 /* Error Banner */
 .error-banner {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  /* CAMBIO: Color de error a fucsia/magenta */
+  background: rgba(236, 72, 153, 0.1);
+  border: 1px solid rgba(236, 72, 153, 0.3);
   border-radius: 12px;
   margin: 20px 30px;
   animation: slideDown 0.3s ease-out;
@@ -128,11 +134,13 @@
 .error-icon {
   font-size: 20px;
   flex-shrink: 0;
-  color: #ef4444;
+  /* CAMBIO: Color de error a fucsia/magenta */
+  color: #EC4899;
 }
 
 .error-message {
-  color: #ef4444;
+  /* CAMBIO: Color de error a fucsia/magenta */
+  color: #EC4899;
   font-weight: 500;
   flex: 1;
 }
@@ -140,7 +148,8 @@
 .error-close {
   background: none;
   border: none;
-  color: #ef4444;
+  /* CAMBIO: Color de error a fucsia/magenta */
+  color: #EC4899;
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -154,7 +163,8 @@
 }
 
 .error-close:hover {
-  background: rgba(239, 68, 68, 0.1);
+  /* CAMBIO: Color de error a fucsia/magenta */
+  background: rgba(236, 72, 153, 0.1);
 }
 
 @keyframes slideDown {
@@ -183,7 +193,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 20, 25, 0.8);
+  /* CAMBIO: Fondo del overlay para coincidir con el tema */
+  background: rgba(20, 10, 30, 0.8);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -201,7 +212,8 @@
   width: 50px;
   height: 50px;
   border: 4px solid rgba(255, 255, 255, 0.1);
-  border-top: 4px solid #3b82f6;
+  /* CAMBIO: Color del spinner a morado */
+  border-top: 4px solid #8B5CF6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 20px;
@@ -252,8 +264,9 @@
   opacity: 1;
 }
 
-.users-card::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.speakers-card::before { background: linear-gradient(90deg, #10b981, #34d399); }
+/* CAMBIO: Gradientes de las tarjetas a tonos morados */
+.users-card::before { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.speakers-card::before { background: linear-gradient(90deg, #c084fc, #e9d5ff); }
 
 .stat-icon {
   font-size: 48px;
@@ -292,7 +305,8 @@
 }
 
 .stat-card:hover .stat-arrow {
-  color: #3b82f6;
+  /* CAMBIO: Color de flecha en hover a morado claro */
+  color: #A78BFA;
   transform: translateX(5px);
 }
 
@@ -387,7 +401,8 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(to bottom, #3b82f6, #10b981);
+  /* CAMBIO: Gradiente a tonos morados */
+  background: linear-gradient(to bottom, #8B5CF6, #c084fc);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -406,7 +421,8 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #3b82f6, #10b981);
+  /* CAMBIO: Gradiente del avatar a tonos morados */
+  background: linear-gradient(45deg, #8B5CF6, #c084fc);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -414,7 +430,8 @@
   font-weight: 600;
   font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  /* CAMBIO: Sombra para coincidir con el color morado */
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .user-info {
@@ -465,9 +482,10 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  /* CAMBIO: Estado por defecto a fucsia/magenta (Inactivo) */
+  background: rgba(236, 72, 153, 0.2);
+  color: #EC4899;
+  border: 1px solid rgba(236, 72, 153, 0.3);
   flex-shrink: 0;
   text-align: center;
   min-width: 70px;
@@ -476,19 +494,21 @@
 }
 
 .user-status.active {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.3);
+  /* CAMBIO: Estado activo a morado */
+  background: rgba(168, 85, 247, 0.2);
+  color: #a855f7;
+  border-color: rgba(168, 85, 247, 0.3);
 }
 
 /* Botón ver todos */
 .view-all-btn {
   width: 100%;
   padding: 15px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 2px solid rgba(59, 130, 246, 0.2);
+  /* CAMBIO: Botón a tonos morados */
+  background: rgba(139, 92, 246, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
-  color: #3b82f6;
+  color: #8B5CF6;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -500,11 +520,12 @@
 }
 
 .view-all-btn:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #60a5fa;
+  /* CAMBIO: Hover del botón a tonos morados */
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #A78BFA;
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 5px 20px rgba(139, 92, 246, 0.2);
 }
 
 /* Update Info */
@@ -524,7 +545,6 @@
 }
 
 /* Responsive para el botón back */
-/* Modificar el header para quitar solo el botón back en responsive */
 @media (max-width: 768px) {
   .admin-header {
     flex-direction: column;
@@ -537,12 +557,10 @@
     justify-content: flex-end;
   }
   
-  /* CAMBIO: Solo ocultar el botón back en header para responsive */
   .back-btn {
     display: none;
   }
   
-  /* El botón logout permanece visible en el header */
   .logout-btn {
     display: flex;
   }
@@ -625,7 +643,8 @@
     position: relative;
     overflow: hidden;
     border: none;
-    background: linear-gradient(135deg, #ed0e0e, #d71616);
+    /* CAMBIO: Gradiente del botón a morado */
+    background: linear-gradient(135deg, #9333ea, #7e22ce);
     color: white;
     box-shadow: 
       0 4px 20px rgba(100, 116, 139, 0.3),
@@ -644,7 +663,8 @@
   }
   
   .bottom-buttons .back-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #3286fb, #334155);
+    /* CAMBIO: Gradiente del hover a morado más intenso */
+    background: linear-gradient(135deg, #a855f7, #581c87);
     transform: translateY(-2px);
     box-shadow: 
       0 8px 30px rgba(100, 116, 139, 0.4),
@@ -655,14 +675,12 @@
     left: 100%;
   }
   
-  /* Estados activos para el botón */
   .bottom-buttons .back-btn:active:not(:disabled) {
     transform: translateY(-1px);
   }
   
-  /* Focus states */
   .bottom-buttons .back-btn:focus-visible {
-    outline: 2px solid #64748b;
+    outline: 2px solid #a855f7;
     outline-offset: 2px;
   }
 }
@@ -718,7 +736,6 @@
     font-size: 13px;
   }
   
-  /* CAMBIO: Ajustar solo el botón back para pantallas muy pequeñas */
   .bottom-buttons .back-btn {
     padding: 0.75rem 1.25rem;
     font-size: 0.95rem;
@@ -749,9 +766,10 @@
 
 /* Estados adicionales */
 .create-btn {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  /* CAMBIO: Botón crear a tonos morados */
+  background: rgba(168, 85, 247, 0.2);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.3);
   padding: 10px 20px;
   border-radius: 20px;
   cursor: pointer;
@@ -761,23 +779,25 @@
 }
 
 .create-btn:hover {
-  background: rgba(16, 185, 129, 0.3);
-  border-color: rgba(16, 185, 129, 0.5);
+  /* CAMBIO: Hover del botón a tonos morados */
+  background: rgba(168, 85, 247, 0.3);
+  border-color: rgba(168, 85, 247, 0.5);
   transform: translateY(-1px);
 }
 
 /* Mejoras para accesibilidad */
+/* CAMBIO: Color de focus a morado */
 .stat-card:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #8B5CF6;
   outline-offset: 2px;
 }
 
 .view-all-btn:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #8B5CF6;
   outline-offset: 2px;
 }
 
 button:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #8B5CF6;
   outline-offset: 2px;
 }
