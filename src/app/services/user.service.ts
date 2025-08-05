@@ -14,7 +14,7 @@ import {
 
 export interface User {
   id: number; // Cambiado a number para coincidir con el backend
-  username: string;
+  name: string;
   email: string;
   firstName?: string;
   lastName?: string;
@@ -25,7 +25,7 @@ export interface User {
 }
 
 export interface CreateUserRequest {
-  username: string;
+  name: string;
   email: string;
   password: string;
   role: string;
@@ -35,7 +35,7 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateUserRequest {
-  username?: string;
+  name?: string;
   email?: string;
   password?: string;
   role?: string;
@@ -118,7 +118,7 @@ export class UserService {
           if (error.error?.message) {
             errorMessage = error.error.message;
           } else {
-            errorMessage = 'Username or email already exists';
+            errorMessage = 'name or email already exists';
           }
           break;
         case 422:
@@ -174,14 +174,14 @@ export class UserService {
     console.log('📝 Creating user with data:', { ...userData, password: '[HIDDEN]' });
     
     // Validar roles válidos
-    const validRoles = ['SUPERADMIN', 'ADMIN', 'USER'];
+    const validRoles = ['EMPLEADO', 'ADMIN'];
     if (!validRoles.includes(userData.role)) {
       return throwError(() => new Error('Invalid role. Must be SUPERADMIN, ADMIN, or USER'));
     }
 
     // Preparar datos limpios
     const cleanData = {
-      username: userData.username.trim(),
+      name: userData.name.trim(),
       email: userData.email.trim(),
       password: userData.password,
       role: userData.role,
@@ -220,7 +220,7 @@ export class UserService {
 
     // Limpiar datos
     const cleanData: any = {};
-    if (userData.username) cleanData.username = userData.username.trim();
+    if (userData.name) cleanData.name = userData.name.trim();
     if (userData.email) cleanData.email = userData.email.trim();
     if (userData.password) cleanData.password = userData.password;
     if (userData.role) cleanData.role = userData.role;

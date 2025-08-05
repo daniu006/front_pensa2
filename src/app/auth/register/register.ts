@@ -16,7 +16,7 @@ import { apiURL } from '../../services/api';
 
 
 export class Register {
-  username: string = '';
+  name: string = '';
   email: string = '';
   password: string = '';
   errorMessage: string = '';
@@ -25,7 +25,7 @@ export class Register {
   constructor(private http: HttpClient, private router: Router) {}
 
   onSubmit() {
-    if (!this.username || !this.email || !this.password) {
+    if (!this.name || !this.email || !this.password) {
       this.errorMessage = 'Todos los campos son obligatorios.';
       return;
     }
@@ -36,7 +36,7 @@ export class Register {
     }
 
     const payload = {
-      username: this.username,
+      name: this.name,
       email: this.email,
       password: this.password,
     };

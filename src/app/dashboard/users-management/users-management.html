@@ -51,7 +51,7 @@
           <input 
             type="text" 
             class="search-input" 
-            placeholder="Search users by username or email..." 
+            placeholder="Search users by name or email..." 
             [(ngModel)]="searchTerm" 
             (input)="onSearchChange()"
           >
@@ -73,7 +73,7 @@
           (change)="onFilterByChange()"
         >
           <option value="all">Search in all fields</option>
-          <option value="username">Username only</option>
+          <option value="name">name only</option>
           <option value="email">Email only</option>
         </select>
       </div>
@@ -96,8 +96,8 @@
         <div class="user-avatar">{{ getUserAvatar(user) }}</div>
         
         <div class="user-info">
-          <div class="user-name">{{ user.firstName || user.username }} {{ user.lastName || '' }}</div>
-          <div class="user-username" [class.highlight]="filterBy === 'all' || filterBy === 'username'">{{ user.username }}</div>
+          <div class="user-name">{{ user.firstName || user.name }} {{ user.lastName || '' }}</div>
+          <div class="user-name" [class.highlight]="filterBy === 'all' || filterBy === 'name'">{{ user.name }}</div>
           <div class="user-email" [class.highlight]="filterBy === 'all' || filterBy === 'email'">{{ user.email }}</div>
           <div class="user-role">{{ user.role }}</div>
           <div class="user-created">Created: {{ user.createdAt | date:'short' }}</div>
@@ -151,8 +151,8 @@
       <form class="user-form" (ngSubmit)="createUser()" #createUserForm="ngForm">
         <div class="form-row">
           <div class="form-group">
-            <label for="username">Username *</label>
-            <input type="text" id="username" name="username" [(ngModel)]="createForm.username" required placeholder="Enter username">
+            <label for="name">name *</label>
+            <input type="text" id="name" name="name" [(ngModel)]="createForm.name" required placeholder="Enter name">
           </div>
           
           <div class="form-group">
@@ -199,8 +199,8 @@
       <form class="user-form" (ngSubmit)="updateUser()" #editUserForm="ngForm">
         <div class="form-row">
           <div class="form-group">
-            <label for="editUsername">Username *</label>
-            <input type="text" id="editUsername" name="editUsername" [(ngModel)]="editForm.username" required placeholder="Enter username">
+            <label for="editname">name *</label>
+            <input type="text" id="editname" name="editname" [(ngModel)]="editForm.name" required placeholder="Enter name">
           </div>
           
           <div class="form-group">
@@ -254,7 +254,7 @@
       
       <div class="delete-content">
         <div class="warning-icon">⚠️</div>
-        <p *ngIf="selectedUser">Are you sure you want to delete user <strong>{{ selectedUser.username }}</strong>?</p>
+        <p *ngIf="selectedUser">Are you sure you want to delete user <strong>{{ selectedUser.name }}</strong>?</p>
         <p class="warning-text">This action cannot be undone.</p>
         
         <div class="form-actions">

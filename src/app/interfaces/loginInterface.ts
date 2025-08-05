@@ -1,6 +1,6 @@
 export interface LoginResponse {
   userId: string;
-  username: string;
+  name: string;
   roleName: string;
   accessToken: string;
   refreshToken: string;

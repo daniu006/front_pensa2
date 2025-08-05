@@ -24,7 +24,7 @@ export class AuthService {
     this.loadUserFromStorage();
   }
 
-  create(user: { username: string, email: string, password: string }): Observable<any> {
+  create(user: { name: string, email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}${registerApi}`, user);
   }
 
@@ -35,7 +35,7 @@ export class AuthService {
           this.saveUserToStorage(response);
           this.currentUserSubject.next(response);
           console.log('✅ User logged in successfully:', {
-            username: response.username,
+            name: response.name,
             role: response.roleName,
             userId: response.userId
           });
@@ -49,7 +49,7 @@ export class AuthService {
       localStorage.setItem('accessToken', userSession.accessToken);
       localStorage.setItem('refreshToken', userSession.refreshToken);
       localStorage.setItem('userId', userSession.userId);
-      localStorage.setItem('username', userSession.username);
+      localStorage.setItem('name', userSession.name);
       localStorage.setItem('roleName', userSession.roleName);
       localStorage.setItem('userSession', JSON.stringify(userSession));      
     } catch (error) {
@@ -115,7 +115,7 @@ export class AuthService {
       'accessToken',
       'refreshToken', 
       'userId',
-      'username',
+      'name',
       'roleName',
       'userSession',
     ];
@@ -146,13 +146,13 @@ export class AuthService {
   }
 
   // Obtener nombre de usuario
-  getUsername(): string | null {
+  getname(): string | null {
     const user = this.getCurrentUser();
     if (user) {
-      return user.username;
+      return user.name;
     }
     // Fallback
-    return localStorage.getItem('username');
+    return localStorage.getItem('name');
   }
 
   // Verificar roles específicos

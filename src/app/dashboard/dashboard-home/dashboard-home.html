@@ -1,37 +1,229 @@
 <div class="sara-dashboard futuristic">
-  <app-navbar>
-  </app-navbar>
+  <app-navbar></app-navbar>
 
-  <main class="sara-content column-layout">
-    <!-- Control Panel - Visible para todos los usuarios -->
-    <div class="widget-card big-card" routerLink="/dashboard/select-panel">
-      <div class="widget-icon">
-        <img class="icon" src="assets/icons/control-panel.svg" alt="Control Icon">
+  <main class="dashboard-main">
+    <div class="container">
+      
+      <div class="welcome-header">
+        <div class="welcome-content">
+          <h1 class="welcome-title">
+            ¡Bienvenido, {{ user?.name || 'Usuario' }}!
+          </h1>
+          <p class="welcome-subtitle">
+            Tu código QR personal para el sistema de asistencia
+          </p>
+          <div class="user-badge">
+            <span class="role-badge" [ngClass]="'role-' + (user?.roleName || 'empleado').toLowerCase()">
+              {{ user?.roleName || 'EMPLEADO' }}
+            </span>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass()">
+              {{ getStatusText() }}
+            </span>
+          </div>
+        </div>
       </div>
-      <div class="widget-label">Control Panel</div>
-    </div>
 
-    <!-- History - Visible para todos los usuarios -->
-    <div class="widget-card big-card" routerLink="/dashboard/history">
-      <div class="widget-icon">
-        <img class="icon" src="assets/icons/history.svg" alt="History" />
+      <div class="attendance-stats-section" *ngIf="attendanceStats">
+        <h3 style="color: white; text-align: center; margin-bottom: 1rem;">📊 Estadísticas de Asistencia</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+              <div class="stat-value">{{ attendanceStats.total_dias_trabajados }}</div>
+              <div class="stat-label">Días trabajados</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-content">
+              <div class="stat-value">{{ attendanceStats.promedio_horas_diarias }}</div>
+              <div class="stat-label">Promedio diario</div>
+            </div>
+          </div>
+          <div class="stat-card" *ngIf="attendanceStats.registro_actual">
+            <div class="stat-icon">🕐</div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getCurrentWorkingTime() || '0h 0m' }}</div>
+              <div class="stat-label">Tiempo actual</div>
+            </div>
+          </div>
+          <div class="stat-card" *ngIf="attendanceStats.ultimo_escaneo">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+              <div class="stat-value">{{ attendanceStats.ultimo_escaneo ? formatTime(attendanceStats.ultimo_escaneo) : 'N/A' }}</div>
+              <div class="stat-label">Último escaneo</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="widget-label">History</div>
-    </div>
 
-    <!-- Advanced Settings - Solo visible para SUPERADMIN -->
-    <div 
-      class="widget-card big-card" 
-      routerLink="/dashboard/adminpanel"
-      *ngIf="isSuperAdmin()">
-      <div class="widget-icon">
-        <img class="icon" src="assets/icons/settings.svg" alt="Advanced Settings" />
+      <div class="admin-actions-section" *ngIf="isAdmin()">
+        <h3 style="color: white; text-align: center; margin-bottom: 1rem;">⚡ Acciones Rápidas de Administrador</h3>
+        <div class="admin-actions-grid">
+          <button class="admin-action-btn create-user-btn" (click)="openCreateUserModal()">
+            <div class="action-icon">👥</div>
+            <div class="action-content">
+              <div class="action-title">Crear Usuario</div>
+              <div class="action-description">Añadir nuevo usuario al sistema</div>
+            </div>
+          </button>
+          <button class="admin-action-btn" routerLink="/dashboard/adminpanel">
+            <div class="action-icon">⚙️</div>
+            <div class="action-content">
+              <div class="action-title">Panel Admin</div>
+              <div class="action-description">Acceder al panel de administración</div>
+            </div>
+          </button>
+          <button class="admin-action-btn" routerLink="/dashboard/users">
+            <div class="action-icon">👤</div>
+            <div class="action-content">
+              <div class="action-title">Gestión Usuarios</div>
+              <div class="action-description">Administrar usuarios del sistema</div>
+            </div>
+          </button>
+        </div>
       </div>
-      <div class="widget-label">Advanced Settings</div>
+
+      <div class="main-grid">
+        
+        <div class="qr-section">
+          <div class="qr-card">
+            <div *ngIf="loading" class="qr-loading"><div class="spinner"></div><p>Cargando tu código QR...</p></div>
+            <div *ngIf="error && !loading" class="qr-error">
+              <div class="error-icon">⚠️</div>
+              <h3>Error al cargar el QR</h3>
+              <p style="white-space: pre-line;">{{ error }}</p>
+              <button class="btn btn-retry" (click)="refreshQR()"><span class="btn-icon">🔄</span>Reintentar</button>
+            </div>
+            <div *ngIf="canShowQR()" class="qr-display">
+              <div class="qr-header">
+                <h2>Tu Código QR</h2>
+                <div class="qr-status"><span class="status-indicator" [ngClass]="qrCode?.activo ? 'active' : 'inactive'">{{ qrCode?.activo ? 'Activo' : 'Inactivo' }}</span></div>
+              </div>
+              <div class="qr-image-container">
+                <img [src]="getQRImageUrl()" [alt]="'Código QR de ' + (user?.name || 'usuario')" class="qr-image" (error)="error = 'Error al cargar la imagen del QR'"/>
+                <div class="qr-overlay"><button class="btn btn-download" (click)="downloadQR()" title="Descargar QR"><span class="btn-icon">📥</span></button></div>
+              </div>
+              <div class="qr-info">
+                <div class="info-grid">
+                  <div class="info-item"><span class="info-label">ID del QR:</span><span class="info-value">{{ qrCode?.id || 'N/A' }}</span></div>
+                  <div class="info-item"><span class="info-label">Escaneos totales:</span><span class="info-value">{{ qrCode?.total_escaneos || 0 }}</span></div>
+                  <div class="info-item"><span class="info-label">Creado:</span><span class="info-value">{{ qrCode?.creado_en | date:'short' }}</span></div>
+                  <div class="info-item" *ngIf="qrCode?.empleado_info"><span class="info-label">Email:</span><span class="info-value">{{ qrCode?.empleado_info?.email || 'N/A' }}</span></div>
+                </div>
+              </div>
+              <div class="qr-actions">
+                <button class="btn btn-primary" (click)="refreshQR()"><span class="btn-icon">🔄</span>Actualizar QR</button>
+                <button class="btn btn-secondary" (click)="downloadQR()"><span class="btn-icon">📥</span>Descargar</button>
+              </div>
+            </div>
+            <div *ngIf="!qrCode && !loading && !error" class="qr-empty">
+              <div class="empty-icon">📱</div>
+              <h3>Sin código QR</h3>
+              <p>No se pudo generar tu código QR. Intenta nuevamente.</p>
+              <button class="btn btn-primary" (click)="refreshQR()"><span class="btn-icon">🔄</span>Generar QR</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="attendance-section">
+          <div class="attendance-card">
+            <div class="attendance-header">
+              <h2>📊 Registros de Asistencia</h2>
+              <div class="attendance-controls">
+                <button class="btn btn-small" (click)="toggleAutoRefresh()" [ngClass]="autoRefresh ? 'btn-success' : 'btn-secondary'"><span class="btn-icon">{{ autoRefresh ? '🔄' : '⏸️' }}</span>Auto-refresh</button>
+                <button class="btn btn-small btn-primary" (click)="refreshAttendance()"><span class="btn-icon">🔄</span>Actualizar</button>
+              </div>
+            </div>
+            <div *ngIf="loadingAttendance" class="attendance-loading"><div class="spinner"></div><p>Cargando registros...</p></div>
+            <div *ngIf="attendanceError && !loadingAttendance" class="attendance-error">
+              <div class="error-icon">⚠️</div>
+              <h4>Error al cargar registros</h4><p>{{ attendanceError }}</p>
+              <button class="btn btn-retry btn-small" (click)="refreshAttendance()"><span class="btn-icon">🔄</span>Reintentar</button>
+            </div>
+            <div *ngIf="attendanceStats?.registro_actual && !loadingAttendance" class="current-session">
+              <div class="current-session-header">
+                <h4>🕐 Sesión Actual</h4>
+                <span class="working-time">{{ getCurrentWorkingTime() || '0h 0m' }}</span>
+              </div>
+              <div class="current-session-details">
+                <div class="session-detail"><span class="detail-label">Entrada:</span><span class="detail-value">{{ formatTime(attendanceStats?.registro_actual?.hora_entrada ?? null) || 'N/A' }}</span></div>
+                <div class="session-detail"><span class="detail-label">Fecha:</span><span class="detail-value">{{ formatDate(attendanceStats?.registro_actual?.fecha ?? null) || 'N/A' }}</span></div>
+              </div>
+            </div>
+            <div *ngIf="attendanceRecords.length > 0 && !loadingAttendance" class="attendance-list">
+              <div class="attendance-item" *ngFor="let record of attendanceRecords">
+                <div class="attendance-date"><div class="date-main">{{ formatDate(record.fecha) }}</div></div>
+                <div class="attendance-times">
+                  <div class="time-entry"><div class="time-label">Entrada</div><div class="time-value entrada">{{ formatTime(record.hora_entrada) }}</div></div>
+                  <div class="time-separator">→</div>
+                  <div class="time-entry"><div class="time-label">Salida</div><div class="time-value" [ngClass]="record.hora_salida ? 'salida' : 'pending'">{{ record.hora_salida ? formatTime(record.hora_salida) : 'Pendiente' }}</div></div>
+                </div>
+                <div class="attendance-duration"><div class="duration-value" *ngIf="record.duracion_jornada; else noDuration">{{ record.duracion_jornada }}</div><ng-template #noDuration><div class="duration-value pending">En curso</div></ng-template></div>
+                <div class="attendance-status"><span class="status-dot" [ngClass]="record.hora_salida ? 'completed' : 'active'"></span><span class="status-text">{{ record.hora_salida ? 'Completado' : 'En curso' }}</span></div>
+              </div>
+            </div>
+            <div *ngIf="attendanceRecords.length === 0 && !loadingAttendance && !attendanceError" class="attendance-empty">
+              <div class="empty-icon">📊</div>
+              <h4>Sin registros de asistencia</h4>
+              <p>Escanea tu código QR para comenzar a registrar tu asistencia.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="showCreateUserModal" class="modal-overlay" (click)="closeCreateUserModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>👥 Crear Nuevo Usuario</h2>
+            <button class="close-btn" (click)="closeCreateUserModal()">×</button>
+          </div>
+          <div *ngIf="createUserError" class="error-banner">
+            <div class="error-content"><span class="error-icon">⚠️</span><span class="error-message">{{ createUserError }}</span><button class="error-close" (click)="clearCreateUserError()">×</button></div>
+          </div>
+          
+          <form class="user-form" (ngSubmit)="createUser()" #createUserForm="ngForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="username">Username *</label>
+                <input type="text" id="username" name="username" [(ngModel)]="newUserData.name" required placeholder="Ingresa el nombre de usuario" [disabled]="loadingCreateUser">
+              </div>
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" [(ngModel)]="newUserData.email" required placeholder="Ingresa el email" [disabled]="loadingCreateUser">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Contraseña *</label>
+                <input type="password" id="password" name="password" [(ngModel)]="newUserData.password" required placeholder="Ingresa la contraseña" minlength="6" [disabled]="loadingCreateUser">
+              </div>
+              <div class="form-group">
+                <label for="role">Rol *</label>
+                <select id="role" name="role" [(ngModel)]="newUserData.role" required [disabled]="loadingCreateUser">
+                  <option value="">Seleccionar rol</option>
+                  <option value="ADMIN">Administrador</option>
+                  <option value="EMPLEADO">Empleado</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="isActive">Estado</label>
+              <div class="checkbox-container">
+                <label class="checkbox-label"><input type="checkbox" id="isActive" name="isActive" [(ngModel)]="newUserData.isActive" [disabled]="loadingCreateUser"><span>Usuario activo</span></label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="!createUserForm.form.valid || loadingCreateUser">
+                <span *ngIf="loadingCreateUser" class="btn-icon">⏳</span>
+                <span *ngIf="!loadingCreateUser" class="btn-icon">👥</span>
+                {{ loadingCreateUser ? 'Creando...' : 'Crear Usuario' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="closeCreateUserModal()" [disabled]="loadingCreateUser">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </main>
-
-  <footer class="sara-footer">
-    <button class="logout-btn logout-btn-mobile" (click)="logout()">Disconnect</button>
-  </footer>
 </div>

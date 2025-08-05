@@ -322,7 +322,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
 
   // Método utilitario para obtener avatar del usuario
   getUserAvatar(user: User): string {
-    return (user.firstName || user.username).charAt(0).toUpperCase();
+    return (user.firstName || user.name).charAt(0).toUpperCase();
   }
 
   // Método utilitario para formatear la fecha de creación

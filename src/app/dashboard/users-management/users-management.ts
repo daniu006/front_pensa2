@@ -26,7 +26,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
 
   // Propiedades del filtro
   searchTerm = '';
-  filterBy: 'all' | 'username' | 'email' = 'all';
+  filterBy: 'all' | 'name' | 'email' = 'all';
 
   // Modal control variables
   showCreateModal = false;
@@ -36,7 +36,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
 
   // Form data
   createForm: CreateUserRequest = {
-    username: '',
+    name: '',
     email: '',
     password: '',
     role: 'USER',
@@ -44,7 +44,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
   };
 
   editForm: UpdateUserRequest = {
-    username: '',
+    name: '',
     email: '',
     role: '',
     isActive: true  // ASEGURAR QUE ES BOOLEAN DESDE EL INICIO
@@ -104,13 +104,13 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
     
     this.filteredUsers = this.users.filter(user => {
       switch (this.filterBy) {
-        case 'username':
-          return user.username.toLowerCase().includes(searchTermLower);
+        case 'name':
+          return user.name.toLowerCase().includes(searchTermLower);
         case 'email':
           return user.email.toLowerCase().includes(searchTermLower);
         case 'all':
         default:
-          return user.username.toLowerCase().includes(searchTermLower) ||
+          return user.name.toLowerCase().includes(searchTermLower) ||
                  user.email.toLowerCase().includes(searchTermLower);
       }
     });
@@ -159,7 +159,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userId');
-      localStorage.removeItem('username');
+      localStorage.removeItem('name');
       localStorage.removeItem('roleName');
       localStorage.removeItem('userSession');
       
@@ -173,7 +173,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
   // Create User Modal Methods
   openCreateModal() {
     this.createForm = {
-      username: '',
+      name: '',
       email: '',
       password: '',
       role: 'USER',
@@ -204,7 +204,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
     
     // Preparar datos del usuario - ASEGURAR TIPOS CORRECTOS
     const userData: CreateUserRequest = {
-      username: this.createForm.username.trim(),
+      name: this.createForm.name.trim(),
       email: this.createForm.email.trim(),
       password: this.createForm.password,
       role: this.createForm.role,
@@ -230,7 +230,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
 
   isCreateFormValid(): boolean {
     return !!(
-      this.createForm.username?.trim() &&
+      this.createForm.name?.trim() &&
       this.createForm.email?.trim() &&
       this.createForm.password &&
       this.createForm.role
@@ -242,7 +242,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
     this.selectedUser = { ...user };
     // ASEGURAR QUE TODOS LOS VALORES SEAN DEL TIPO CORRECTO
     this.editForm = {
-      username: user.username,
+      name: user.name,
       email: user.email,
       role: user.role,
       isActive: Boolean(user.isActive) // CONVERTIR EXPLICITAMENTE A BOOLEAN
@@ -275,8 +275,8 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
     const updateData: UpdateUserRequest = {};
     
     // Solo incluir campos que han cambiado y tienen valores válidos
-    if (this.editForm.username?.trim() && this.editForm.username.trim() !== this.selectedUser.username) {
-      updateData.username = this.editForm.username.trim();
+    if (this.editForm.name?.trim() && this.editForm.name.trim() !== this.selectedUser.name) {
+      updateData.name = this.editForm.name.trim();
     }
     
     if (this.editForm.email?.trim() && this.editForm.email.trim() !== this.selectedUser.email) {
@@ -323,7 +323,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
 
   isEditFormValid(): boolean {
     return !!(
-      this.editForm.username?.trim() &&
+      this.editForm.name?.trim() &&
       this.editForm.email?.trim() &&
       this.editForm.role
     );
@@ -391,7 +391,7 @@ export class UsersManagementComponent implements OnInit, OnDestroy {
 
   // Método utilitario para obtener avatar
   getUserAvatar(user: User): string {
-    return (user.firstName || user.username).charAt(0).toUpperCase();
+    return (user.firstName || user.name).charAt(0).toUpperCase();
   }
 
   // Método para limpiar errores
