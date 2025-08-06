@@ -85,7 +85,7 @@
 
 .letter-block:hover {
   transform: translateY(-3px) scale(1.05);
-  filter: drop-shadow(0 8px 16px rgba(82, 121, 111, 0.3));
+  filter: drop-shadow(0 8px 16px rgba(229, 4, 4, 0.3));
 }
 
 /* Línea separadora mejorada */
@@ -93,11 +93,11 @@
   width: clamp(2px, 0.4vw, 3px);
   height: clamp(2rem, 6vw, 3rem);
   background: linear-gradient(to bottom, 
-    #cad2c5 0%,
-    #84a98c 25%,
-    #52796f 50%,
-    #354f52 75%,
-    #2f3e46 100%);
+    #56d00b 0%,
+    #660ed1 25%,
+    #0cf0b7 50%,
+    #23b6c7 75%,
+    #1292d6 100%);
   flex-shrink: 0;
   border-radius: 2px;
   position: relative;
@@ -112,14 +112,14 @@
   transform: translate(-50%, -50%);
   width: 8px;
   height: 8px;
-  background: radial-gradient(circle, #84a98c, #52796f);
+  background: radial-gradient(circle, #141be7, #00bc8d);
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(132, 169, 140, 0.5);
+  box-shadow: 0 0 10px rgba(233, 90, 7, 0.5);
 }
 
 /* Colores de las letras con gradientes verdes */
 .color-blue {
-  background: linear-gradient(135deg, #cad2c5 0%, #84a98c 100%);
+  background: linear-gradient(135deg, #020202 0%, #84a98c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -141,7 +141,7 @@
 
 /* Efecto especial para la primera y última letra */
 .letter-block:first-child {
-  background: linear-gradient(135deg, #84a98c, #52796f, #354f52);
+  background: linear-gradient(135deg, #6307cc, #52796f, #354f52);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -161,7 +161,7 @@
 }
 
 .letter-block:last-child {
-  background: linear-gradient(135deg, #2f3e46, #354f52, #52796f);
+  background: linear-gradient(135deg, #13d37c, #13d37c, #13d37c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -362,11 +362,11 @@
   }
   
   .separator {
-    background: linear-gradient(to bottom, #84a98c, #cad2c5);
+    background: linear-gradient(to bottom, #000000, #000000);
   }
   
   .gradient {
-    background: linear-gradient(to bottom, #cad2c5, #84a98c);
+    background: linear-gradient(to bottom, #000000, #000000);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
