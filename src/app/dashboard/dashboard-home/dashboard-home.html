@@ -50,7 +50,13 @@
               <div class="stat-label">Promedio diario</div>
             </div>
           </div>
-         
+          <div class="stat-card" *ngIf="attendanceStats.registro_actual">
+            <div class="stat-icon">🕐</div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getCurrentWorkingTime() || '0h 0m' }}</div>
+              <div class="stat-label">Tiempo actual</div>
+            </div>
+          </div>
           
         </div>
       </div>
@@ -68,8 +74,8 @@
           <button class="admin-action-btn" routerLink="/dashboard/adminpanel">
             <div class="action-icon">⚙️</div>
             <div class="action-content">
-              <div class="action-title">Panel de Empleados</div>
-              <div class="action-description">Acceder al panel de Empleados</div>
+              <div class="action-title">Panel Admin</div>
+              <div class="action-description">Acceder al panel de administración</div>
             </div>
           </button>
         </div>
@@ -116,8 +122,7 @@
           <div class="attendance-card">
             <div class="attendance-header">
               <h2>📊 Registros de Asistencia</h2>
-              <div class="attendance-controls">
-              </div>
+              
             </div>
             <div *ngIf="loadingAttendance" class="attendance-loading"><div class="spinner"></div><p>Cargando registros...</p></div>
             <div *ngIf="attendanceError && !loadingAttendance" class="attendance-error">
@@ -126,7 +131,14 @@
               <button class="btn btn-retry btn-small" (click)="refreshAttendance()"><span class="btn-icon">🔄</span>Reintentar</button>
             </div>
             <div *ngIf="attendanceStats?.registro_actual && !loadingAttendance" class="current-session">
-          
+              <div class="current-session-header">
+                <h4>🕐 Sesión Actual</h4>
+                <span class="working-time">{{ getCurrentWorkingTime() || '0h 0m' }}</span>
+              </div>
+              <div class="current-session-details">
+                <div class="session-detail"><span class="detail-label">Entrada:</span><span class="detail-value">{{ formatTime(attendanceStats?.registro_actual?.hora_entrada ?? null) || 'N/A' }}</span></div>
+                <div class="session-detail"><span class="detail-label">Fecha:</span><span class="detail-value">{{ formatDate(attendanceStats?.registro_actual?.fecha ?? null) || 'N/A' }}</span></div>
+              </div>
             </div>
             <div *ngIf="attendanceRecords.length > 0 && !loadingAttendance" class="attendance-list">
               <div class="attendance-item" *ngFor="let record of attendanceRecords">

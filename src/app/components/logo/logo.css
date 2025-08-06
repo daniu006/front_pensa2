@@ -44,7 +44,7 @@
 
 /* Decoración de hojas */
 .splash-container::before {
-  content: '🌱';
+  content: '';
   position: absolute;
   left: -30px;
   top: 50%;
@@ -55,7 +55,7 @@
 }
 
 .splash-container::after {
-  content: '🍃';
+  content: '';
   position: absolute;
   right: -30px;
   top: 50%;

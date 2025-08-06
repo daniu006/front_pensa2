@@ -174,7 +174,7 @@
   position: relative;
 
   &::before {
-    content: '🌿';
+    content: '';
     position: absolute;
     top: -20px;
     left: -30px;
@@ -581,7 +581,7 @@ form {
     height: 100%;
     background:
       linear-gradient(135deg, rgba(82, 121, 111, 0.1) 0%, rgba(132, 169, 140, 0.2) 100%),
-      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="%2384a98c" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="%2352796f" opacity="0.08"/><circle cx="40" cy="80" r="1" fill="%23cad2c5" opacity="0.06"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      url('data:image/svg+xml,< xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="%2384a98c" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="%2352796f" opacity="0.08"/><circle cx="40" cy="80" r="1" fill="%23cad2c5" opacity="0.06"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
     backdrop-filter: blur(20px);
     z-index: 1;
     display: block;
