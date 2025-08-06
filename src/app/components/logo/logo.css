@@ -1,10 +1,33 @@
+/* Logo Component - Green Nature Theme */
 :host {
-  display: inline-block; /* para que no ocupe todo el alto ni ancho */
-  height: 122.4px; /* igual que tu SVG */
-  font-family: 'Bebas Neue', sans-serif;
-  background: transparent; /* sin fondo */
+  display: inline-block;
+  height: clamp(80px, 15vw, 122.4px);
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  background: transparent;
   margin: 0;
   padding: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Efecto de brillo verde sutil */
+:host::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(ellipse at center, rgba(132, 169, 140, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: gentle-glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes gentle-glow {
+  0% { opacity: 0.3; transform: scale(0.95); }
+  100% { opacity: 0.7; transform: scale(1.05); }
 }
 
 .splash-container {
@@ -12,30 +35,380 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  gap: 0.5rem; /* espacio pequeño entre letras */
+  gap: clamp(0.3rem, 1.2vw, 0.6rem);
+  flex-wrap: nowrap;
+  overflow: hidden;
+  position: relative;
+  padding: 0.5rem;
+}
+
+/* Decoración de hojas */
+.splash-container::before {
+  content: '🌱';
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  opacity: 0.6;
+  animation: float-leaf 3s ease-in-out infinite;
+}
+
+.splash-container::after {
+  content: '🍃';
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  opacity: 0.6;
+  animation: float-leaf 3s ease-in-out infinite reverse;
+}
+
+@keyframes float-leaf {
+  0%, 100% { transform: translateY(-50%) rotate(0deg); }
+  50% { transform: translateY(-60%) rotate(5deg); }
 }
 
 .letter-block {
-  font-size: 4rem; /* tamaño proporcional para 122px alto */
+  font-size: clamp(2rem, 8vw, 4rem);
   font-weight: bold;
   text-align: center;
-  animation: none !important; /* quitar animaciones */
+  animation: none !important;
+  flex-shrink: 0;
+  line-height: 0.9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Línea separadora */
+.letter-block:hover {
+  transform: translateY(-3px) scale(1.05);
+  filter: drop-shadow(0 8px 16px rgba(82, 121, 111, 0.3));
+}
+
+/* Línea separadora mejorada */
 .separator {
-  width: 2px;
-  height: 3rem; /* proporcionado para tamaño */
-  background-color: #eeeeee;
+  width: clamp(2px, 0.4vw, 3px);
+  height: clamp(2rem, 6vw, 3rem);
+  background: linear-gradient(to bottom, 
+    #cad2c5 0%,
+    #84a98c 25%,
+    #52796f 50%,
+    #354f52 75%,
+    #2f3e46 100%);
+  flex-shrink: 0;
+  border-radius: 2px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(82, 121, 111, 0.2);
 }
 
-/* Colores */
+.separator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #84a98c, #52796f);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(132, 169, 140, 0.5);
+}
+
+/* Colores de las letras con gradientes verdes */
 .color-blue {
-  color: #c4c4c4;
+  background: linear-gradient(135deg, #cad2c5 0%, #84a98c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(2px 2px 4px rgba(132, 169, 140, 0.3));
 }
 
 .gradient {
-  background: linear-gradient(to bottom, #A0A0A0, #3A3A3A);
+  background: linear-gradient(to bottom, 
+    #52796f 0%,
+    #354f52 25%,
+    #2f3e46 50%,
+    #354f52 75%,
+    #52796f 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(2px 2px 4px rgba(47, 62, 70, 0.4));
+}
+
+/* Efecto especial para la primera y última letra */
+.letter-block:first-child {
+  background: linear-gradient(135deg, #84a98c, #52796f, #354f52);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.letter-block:first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 40%, rgba(132, 169, 140, 0.2) 50%, transparent 60%);
+  animation: shine 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.letter-block:last-child {
+  background: linear-gradient(135deg, #2f3e46, #354f52, #52796f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/*
+  ==================================
+  MEDIA QUERIES RESPONSIVE
+  ==================================
+*/
+
+/* Tablets grandes y escritorio pequeño */
+@media (max-width: 1024px) {
+  :host {
+    height: clamp(70px, 12vw, 100px);
+  }
+  
+  .letter-block {
+    font-size: clamp(1.8rem, 7vw, 3.5rem);
+  }
+  
+  .separator {
+    height: clamp(1.8rem, 5.5vw, 2.8rem);
+    width: clamp(2px, 0.3vw, 2.5px);
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  :host {
+    height: clamp(60px, 10vw, 90px);
+  }
+  
+  .splash-container {
+    gap: clamp(0.2rem, 0.8vw, 0.4rem);
+  }
+  
+  .letter-block {
+    font-size: clamp(1.5rem, 6vw, 3rem);
+  }
+  
+  .separator {
+    width: clamp(1.5px, 0.25vw, 2px);
+    height: clamp(1.5rem, 4.5vw, 2.5rem);
+  }
+}
+
+/* Móviles grandes */
+@media (max-width: 640px) {
+  :host {
+    height: clamp(50px, 8vw, 80px);
+  }
+  
+  .splash-container {
+    gap: clamp(0.15rem, 0.6vw, 0.3rem);
+  }
+  
+  .letter-block {
+    font-size: clamp(1.2rem, 5vw, 2.5rem);
+  }
+  
+  .separator {
+    width: 1.5px;
+    height: clamp(1.2rem, 3.8vw, 2rem);
+  }
+  
+  .splash-container::before,
+  .splash-container::after {
+    display: none; /* Ocultar decoraciones en móviles */
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  :host {
+    height: clamp(40px, 6vw, 70px);
+  }
+  
+  .splash-container {
+    gap: clamp(0.1rem, 0.4vw, 0.25rem);
+  }
+  
+  .letter-block {
+    font-size: clamp(1rem, 4.5vw, 2rem);
+  }
+  
+  .separator {
+    width: 1px;
+    height: clamp(1rem, 3.2vw, 1.8rem);
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 360px) {
+  :host {
+    height: clamp(35px, 5vw, 60px);
+  }
+  
+  .splash-container {
+    gap: 0.1rem;
+  }
+  
+  .letter-block {
+    font-size: clamp(0.9rem, 4vw, 1.8rem);
+  }
+  
+  .separator {
+    width: 1px;
+    height: clamp(0.9rem, 2.8vw, 1.5rem);
+  }
+}
+
+/* Pantallas muy anchas */
+@media (min-width: 1440px) {
+  :host {
+    height: clamp(100px, 8vw, 140px);
+  }
+  
+  .letter-block {
+    font-size: clamp(3rem, 6vw, 4.5rem);
+  }
+  
+  .separator {
+    width: clamp(3px, 0.3vw, 4px);
+    height: clamp(2.5rem, 4vw, 3.5rem);
+  }
+}
+
+/* Modo landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+  :host {
+    height: clamp(30px, 8vh, 60px);
+  }
+  
+  .letter-block {
+    font-size: clamp(1rem, 6vh, 2.5rem);
+  }
+  
+  .separator {
+    height: clamp(0.8rem, 4vh, 2rem);
+  }
+  
+  .splash-container {
+    gap: clamp(0.1rem, 0.5vh, 0.3rem);
+  }
+}
+
+/*
+  ==================================
+  MEJORAS DE ACCESIBILIDAD
+  ==================================
+*/
+
+/* Reducir movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .letter-block,
+  :host::before,
+  .splash-container::before,
+  .splash-container::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .color-blue {
+    background: #2f3e46;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .separator {
+    background: #2f3e46;
+  }
+  
+  .gradient {
+    background: #2f3e46;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Tema oscuro del sistema */
+@media (prefers-color-scheme: dark) {
+  .color-blue {
+    background: linear-gradient(135deg, #84a98c, #cad2c5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .separator {
+    background: linear-gradient(to bottom, #84a98c, #cad2c5);
+  }
+  
+  .gradient {
+    background: linear-gradient(to bottom, #cad2c5, #84a98c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/*
+  ==================================
+  CONTENEDOR FLEX FALLBACK
+  ==================================
+*/
+
+/* Para navegadores que no soporten clamp() */
+@supports not (font-size: clamp(1rem, 4vw, 2rem)) {
+  .letter-block {
+    font-size: 3rem;
+  }
+  
+  .separator {
+    width: 2px;
+    height: 2.5rem;
+  }
+  
+  :host {
+    height: 100px;
+  }
+}
+
+/*
+  ==================================
+  OPTIMIZACIONES DE RENDIMIENTO
+  ==================================
+*/
+
+/* Optimizar para GPUs móviles */
+.letter-block,
+.separator {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Evitar reflows innecesarios */
+.splash-container {
+  contain: layout style paint;
 }

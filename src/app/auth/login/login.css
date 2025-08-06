@@ -1,4 +1,4 @@
-/* ANGULAR LOGIN COMPONENT - TEMA MORADO PREMIUM SPLIT SCREEN */
+/* ANGULAR LOGIN COMPONENT - TEMA VERDE ORGÁNICO SPLIT SCREEN */
 
 /* Reset y configuración del host */
 :host {
@@ -6,7 +6,12 @@
   min-height: 100vh;
   width: 100%;
   padding: 0;
-  background: linear-gradient(135deg, #0a0118 0%, #1a0d2e 25%, #2d1b4e 50%, #4c2a85 75%, #6d28d9 100%);
+  background: linear-gradient(135deg, 
+    #2f3e46 0%, 
+    #354f52 25%, 
+    #52796f 50%, 
+    #84a98c 75%, 
+    #cad2c5 100%);
   background-attachment: fixed;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
   animation: fadeIn 0.8s ease-out;
@@ -15,7 +20,7 @@
   overflow: hidden;
 }
 
-/* Partículas de fondo animadas */
+/* Partículas de fondo con temática orgánica */
 :host::before {
   content: '';
   position: fixed;
@@ -24,9 +29,9 @@
   width: 100%;
   height: 100%;
   background-image:
-    radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(196, 181, 253, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(132, 169, 140, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(82, 121, 111, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(202, 210, 197, 0.08) 0%, transparent 50%);
   animation: float 20s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
@@ -37,9 +42,9 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(132, 169, 140, 0.3) 0%, transparent 70%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: breathe 4s ease-in-out infinite;
@@ -73,7 +78,7 @@
   }
 }
 
-/* Contenedor principal - ahora es el panel izquierdo */
+/* Contenedor principal - panel izquierdo */
 .container {
   flex: 1;
   display: flex;
@@ -82,7 +87,7 @@
   align-items: center;
   max-width: 500px;
   padding: clamp(2rem, 5vw, 4rem);
-  background: rgba(26, 13, 46, 0.85);
+  background: rgba(47, 62, 70, 0.85);
   backdrop-filter: blur(30px);
   position: relative;
   min-height: 100vh;
@@ -98,12 +103,12 @@
     height: 100%;
     background: linear-gradient(180deg,
       transparent 0%,
-      rgba(168, 85, 247, 0.6) 20%,
-      rgba(139, 92, 246, 0.8) 50%,
-      rgba(168, 85, 247, 0.6) 80%,
+      rgba(132, 169, 140, 0.6) 20%,
+      rgba(82, 121, 111, 0.8) 50%,
+      rgba(132, 169, 140, 0.6) 80%,
       transparent 100%);
     animation: pulse 3s ease-in-out infinite;
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 20px rgba(132, 169, 140, 0.5);
   }
 
   &::after {
@@ -113,22 +118,22 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 30% 70%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    background: radial-gradient(circle at 30% 70%, rgba(82, 121, 111, 0.08) 0%, transparent 50%);
     pointer-events: none;
   }
 }
 
-/* Panel derecho - para la imagen (hidden by default) */
+/* Panel derecho - para la imagen */
 .image-panel {
-  position: absolute; /* Keep absolute for initial positioning, will change in media query */
+  position: absolute;
   top: 0;
   right: 0;
   width: 50%;
-  height: 90%;
-  display: none; /* Hidden by default for mobile */
+  height: 100%;
+  display: none;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(76, 42, 133, 0.2) 100%);
+  background: linear-gradient(135deg, rgba(82, 121, 111, 0.1) 0%, rgba(132, 169, 140, 0.2) 100%);
   backdrop-filter: blur(20px);
   z-index: 2;
   overflow: hidden;
@@ -140,11 +145,13 @@
   object-fit: cover;
   opacity: 0.9;
   transition: all 0.5s ease;
+  filter: sepia(0.2) saturate(1.2) hue-rotate(80deg);
 }
 
 .image-panel:hover img {
   transform: scale(1.05);
   opacity: 1;
+  filter: sepia(0.3) saturate(1.3) hue-rotate(80deg);
 }
 
 @keyframes pulse {
@@ -152,28 +159,39 @@
   50% { opacity: 1; transform: scaleY(1.02); }
 }
 
-/* Logo con efectos premium */
+/* Logo con efectos orgánicos */
 .logo {
   font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 200;
   letter-spacing: clamp(0.2em, 0.8vw, 0.4em);
-  color: #f3e8ff;
+  color: #cad2c5;
   margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
   text-shadow:
-    0 0 20px rgba(139, 92, 246, 0.6),
-    0 0 40px rgba(168, 85, 247, 0.4),
+    0 0 20px rgba(132, 169, 140, 0.6),
+    0 0 40px rgba(202, 210, 197, 0.4),
     0 4px 20px rgba(0, 0, 0, 0.3);
   animation: logoGlow 0.8s ease-out 0.2s both;
   position: relative;
 
   &::before {
+    content: '🌿';
+    position: absolute;
+    top: -20px;
+    left: -30px;
+    font-size: 2rem;
+    opacity: 0.7;
+    animation: logoLeaf 6s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  &::after {
     content: '';
     position: absolute;
     top: -10px;
     left: -10px;
     right: -10px;
     bottom: -10px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(132, 169, 140, 0.2) 0%, transparent 70%);
     border-radius: 50%;
     animation: logoHalo 4s ease-in-out infinite;
     z-index: -1;
@@ -184,14 +202,14 @@
   from {
     opacity: 0;
     transform: translateY(30px) scale(0.8);
-    text-shadow: 0 0 0 rgba(139, 92, 246, 0);
+    text-shadow: 0 0 0 rgba(132, 169, 140, 0);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
     text-shadow:
-      0 0 20px rgba(139, 92, 246, 0.6),
-      0 0 40px rgba(168, 85, 247, 0.4),
+      0 0 20px rgba(132, 169, 140, 0.6),
+      0 0 40px rgba(202, 210, 197, 0.4),
       0 4px 20px rgba(0, 0, 0, 0.3);
   }
 }
@@ -201,10 +219,16 @@
   50% { transform: scale(1.1); opacity: 0.4; }
 }
 
+@keyframes logoLeaf {
+  0%, 100% { transform: rotate(0deg) translateY(0px); }
+  25% { transform: rotate(5deg) translateY(-5px); }
+  75% { transform: rotate(-5deg) translateY(5px); }
+}
+
 .login-title {
   font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 400;
-  color: #e9d5ff;
+  color: #84a98c;
   margin-bottom: clamp(2rem, 5vw, 3rem);
   letter-spacing: 1px;
   line-height: 1.2;
@@ -219,7 +243,7 @@
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
+    background: linear-gradient(90deg, transparent, #52796f, transparent);
     animation: lineGrow 0.8s ease-out 0.6s both;
   }
 }
@@ -268,7 +292,7 @@ form {
 
 .form-label {
   display: block;
-  color: #c4b5fd;
+  color: #84a98c;
   font-size: clamp(0.9rem, 3vw, 1rem);
   font-weight: 600;
   margin-bottom: clamp(0.75rem, 2vw, 1rem);
@@ -286,28 +310,28 @@ form {
 .input {
   width: 100%;
   padding: clamp(1rem, 3vw, 1.25rem) clamp(1.25rem, 3vw, 1.5rem);
-  border: 2px solid rgba(168, 85, 247, 0.2);
+  border: 2px solid rgba(132, 169, 140, 0.2);
   border-radius: clamp(12px, 3vw, 16px);
   font-size: clamp(16px, 3vw, 1.1rem);
-  background: rgba(76, 42, 133, 0.15);
-  color: #f3e8ff;
+  background: rgba(47, 62, 70, 0.3);
+  color: #cad2c5;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   backdrop-filter: blur(10px);
 
   &::placeholder {
-    color: #a78bfa;
+    color: #52796f;
     font-style: italic;
     transition: all 0.3s ease;
   }
 
   &:focus {
-    border-color: #8b5cf6;
+    border-color: #52796f;
     box-shadow:
-      0 0 0 4px rgba(139, 92, 246, 0.2),
-      0 8px 30px rgba(139, 92, 246, 0.3),
+      0 0 0 4px rgba(82, 121, 111, 0.2),
+      0 8px 30px rgba(82, 121, 111, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    background: rgba(76, 42, 133, 0.25);
+    background: rgba(47, 62, 70, 0.5);
     transform: translateY(-2px);
 
     &::placeholder {
@@ -317,8 +341,8 @@ form {
 
     + .password-toggle,
     ~ .form-label {
-      color: #8b5cf6;
-      text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      color: #52796f;
+      text-shadow: 0 0 10px rgba(82, 121, 111, 0.5);
     }
   }
 
@@ -327,23 +351,23 @@ form {
   }
 
   &.error {
-    border-color: rgba(244, 63, 94, 0.6);
-    box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.2);
+    border-color: rgba(220, 38, 127, 0.6);
+    box-shadow: 0 0 0 4px rgba(220, 38, 127, 0.2);
     animation: shake 0.5s ease-in-out;
   }
 
   &.success {
-    border-color: rgba(34, 197, 94, 0.6);
-    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+    border-color: rgba(132, 169, 140, 0.8);
+    box-shadow: 0 0 0 4px rgba(132, 169, 140, 0.3);
   }
 }
 
 .password-toggle {
   position: absolute;
   right: clamp(0.75rem, 2vw, 1rem);
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  color: #a78bfa;
+  background: rgba(82, 121, 111, 0.2);
+  border: 1px solid rgba(132, 169, 140, 0.3);
+  color: #52796f;
   cursor: pointer;
   padding: clamp(8px, 2vw, 10px);
   border-radius: clamp(8px, 2vw, 10px);
@@ -357,15 +381,15 @@ form {
   backdrop-filter: blur(10px);
 
   &:hover {
-    color: #8b5cf6;
-    background: rgba(139, 92, 246, 0.2);
-    border-color: #8b5cf6;
+    color: #354f52;
+    background: rgba(82, 121, 111, 0.3);
+    border-color: #52796f;
     transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 4px 15px rgba(82, 121, 111, 0.4);
   }
 
   &:focus {
-    outline: 2px solid #8b5cf6;
+    outline: 2px solid #52796f;
     outline-offset: 2px;
   }
 }
@@ -376,8 +400,8 @@ form {
 }
 
 .btn-login {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
-  color: white;
+  background: linear-gradient(135deg, #52796f 0%, #354f52 50%, #2f3e46 100%);
+  color: #cad2c5;
   padding: clamp(1.125rem, 3vw, 1.375rem) clamp(2rem, 5vw, 2.5rem);
   width: 100%;
   border: none;
@@ -388,8 +412,8 @@ form {
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 8px 30px rgba(139, 92, 246, 0.4),
-    0 0 0 1px rgba(168, 85, 247, 0.3),
+    0 8px 30px rgba(82, 121, 111, 0.4),
+    0 0 0 1px rgba(132, 169, 140, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -423,11 +447,11 @@ form {
   }
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+    background: linear-gradient(135deg, #354f52 0%, #2f3e46 50%, #1a2327 100%);
     transform: translateY(-3px);
     box-shadow:
-      0 15px 40px rgba(139, 92, 246, 0.6),
-      0 0 0 1px rgba(168, 85, 247, 0.5),
+      0 15px 40px rgba(82, 121, 111, 0.6),
+      0 0 0 1px rgba(132, 169, 140, 0.5),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
 
     &::before {
@@ -443,13 +467,13 @@ form {
   &:active:not(:disabled) {
     transform: translateY(-1px);
     box-shadow:
-      0 8px 25px rgba(139, 92, 246, 0.5),
-      0 0 0 1px rgba(168, 85, 247, 0.4);
+      0 8px 25px rgba(82, 121, 111, 0.5),
+      0 0 0 1px rgba(132, 169, 140, 0.4);
   }
 
   &:disabled {
-    background: rgba(168, 85, 247, 0.3);
-    color: #a78bfa;
+    background: rgba(132, 169, 140, 0.3);
+    color: #52796f;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -461,7 +485,7 @@ form {
   }
 
   &:focus-visible {
-    outline: 3px solid rgba(139, 92, 246, 0.5);
+    outline: 3px solid rgba(82, 121, 111, 0.5);
     outline-offset: 3px;
   }
 }
@@ -483,7 +507,7 @@ form {
   height: clamp(18px, 4vw, 20px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #ffffff;
+  border-top-color: #cad2c5;
   animation: spin 1s linear infinite;
   margin-right: 10px;
 }
@@ -493,18 +517,18 @@ form {
 }
 
 .error-message {
-  color: #f472b6;
+  color: #f87171;
   font-size: clamp(0.85rem, 2.5vw, 0.95rem);
   margin-top: clamp(1rem, 3vw, 1.25rem);
   padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.25rem);
-  background: rgba(244, 114, 182, 0.1);
-  border: 1px solid rgba(244, 114, 182, 0.4);
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.4);
   border-radius: clamp(8px, 2vw, 12px);
   text-align: center;
   line-height: 1.5;
   animation: errorPop 0.5s ease-out;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(244, 114, 182, 0.2);
+  box-shadow: 0 4px 15px rgba(248, 113, 113, 0.2);
 }
 
 @keyframes errorPop {
@@ -530,27 +554,24 @@ form {
 /* ========== RESPONSIVE DESIGN ========== */
 
 /* Tablets y pantallas medianas */
-@media (min-width: 769px) { /* Changed to min-width to show image panel on larger screens */
+@media (min-width: 769px) {
   :host {
-    flex-direction: row; /* Ensure split screen on larger devices */
+    flex-direction: row;
   }
 
-  /* Show the image panel on larger screens (dashboard mode) */
   .image-panel {
-    display: flex; /* Show the image panel */
-    position: relative; /* Make it part of the flex layout */
+    display: flex;
+    position: relative;
     width: 50%;
     height: 100vh;
   }
 
-  /* Adjust container width for split screen */
   .container {
-    flex: 1; /* Allow container to take remaining space */
-    max-width: none; /* Remove max-width for flex distribution */
-    width: 50%; /* Explicitly set width for split screen */
+    flex: 1;
+    max-width: none;
+    width: 50%;
   }
 
-  /* Ensure the host::after (grainy background on right) is visible */
   :host::after {
     content: '';
     position: absolute;
@@ -559,27 +580,24 @@ form {
     width: 50%;
     height: 100%;
     background:
-      linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(76, 42, 133, 0.2) 100%),
-      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="%23a855f7" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="%238b5cf6" opacity="0.08"/><circle cx="40" cy="80" r="1" fill="%23c084fc" opacity="0.06"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      linear-gradient(135deg, rgba(82, 121, 111, 0.1) 0%, rgba(132, 169, 140, 0.2) 100%),
+      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="%2384a98c" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="%2352796f" opacity="0.08"/><circle cx="40" cy="80" r="1" fill="%23cad2c5" opacity="0.06"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
     backdrop-filter: blur(20px);
     z-index: 1;
-    display: block; /* Ensure it's displayed */
+    display: block;
   }
 }
 
-
-/* Móviles y pantallas pequeñas (max-width: 768px) */
+/* Móviles y pantallas pequeñas */
 @media (max-width: 768px) {
   :host {
-    flex-direction: column; /* Stack elements vertically */
+    flex-direction: column;
   }
 
-  /* Hide the image panel on smaller screens */
   .image-panel {
     display: none;
   }
 
-  /* Hide the host::after (grainy background on right) on smaller screens */
   :host::after {
     display: none;
   }
@@ -590,7 +608,7 @@ form {
     min-height: 100vh;
 
     &::before {
-      display: none; /* Hide the border effect on mobile */
+      display: none;
     }
   }
 }
@@ -646,19 +664,19 @@ form {
 
 @media (prefers-contrast: high) {
   .container {
-    background: rgba(26, 13, 46, 0.98);
-    border: 2px solid #c084fc;
+    background: rgba(47, 62, 70, 0.98);
+    border: 2px solid #84a98c;
   }
 
   .input {
-    border-color: #c084fc;
-    background: rgba(139, 92, 246, 0.15);
+    border-color: #84a98c;
+    background: rgba(82, 121, 111, 0.15);
   }
 
   .logo,
   .login-title,
   .form-label {
-    color: #faf5ff;
+    color: #ffffff;
   }
 }
 

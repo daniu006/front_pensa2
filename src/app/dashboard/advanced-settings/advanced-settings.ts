@@ -8,6 +8,29 @@ import { User, UserService } from '../../services/user.service';
 import { apiURL } from '../../services/api';
 import { loginApi, speakersApi } from '../../constants/endPoints';
 
+// Se elimina la importación de User y UserService ya que los datos se obtendrán directamente.
+
+// --- NUEVAS INTERFACES PARA DATOS DE ASISTENCIA ---
+interface UserAttendanceRecord {
+  hora_entrada: string | null;
+  hora_salida: string | null;
+  duracion_jornada: string | null;
+  status: 'Present' | 'Absent' | 'Completed';
+}
+
+interface UserWithAttendance {
+  id: number;
+  name: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  attendance_today: UserAttendanceRecord;
+}
+
+// --- Interfaz de Speaker (sin cambios) ---
 interface Speaker {
   id: number;
   name: string;
@@ -41,8 +64,10 @@ interface SpeakersApiResponse {
 export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   
   private readonly API_URL = apiURL;
+  // URL del backend de FastAPI
+  private readonly FASTAPI_URL = 'https://fastapi-production-b6bb.up.railway.app';
 
-  // Datos del dashboard
+  // Datos del dashboard (actualizado para usar la nueva interfaz)
   dashboardData = {
     stats: {
       totalUsers: 0,
@@ -53,7 +78,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
       inactiveSpeakers: 0,
       lastUpdate: new Date()
     },
-    recentUsers: [] as User[],
+    allUsers: [] as UserWithAttendance[], // Cambiado de recentUsers a allUsers
     recentSpeakers: [] as Speaker[]
   };
 
@@ -86,13 +111,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     this.loadDashboardData();
 
     // Suscribirse a los cambios en la lista de usuarios
-    this.subscription.add(
-      this.userService.users$.subscribe(users => {
-        if (users.length > 0) {
-          this.updateUserStats(users);
-        }
-      })
-    );
+    // Se elimina la suscripción a userService.users$ ya que se carga directamente
   }
 
   ngOnDestroy() {
@@ -105,39 +124,38 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  // Método para cargar datos del dashboard
+  // Carga todos los datos del dashboard
   loadDashboardData() {
     this.loading = true;
     this.error = null;
     
     console.log('🔄 Loading dashboard data (users and speakers)...');
     
-    // Cargar usuarios
-    this.loadUsersData();
-    
-    // Cargar speakers
-    this.loadSpeakersData();
+    this.loadUsersWithAttendance(); // Cargar usuarios con asistencia
+    this.loadSpeakersData(); // Cargar speakers
   }
 
-  // Cargar datos de usuarios
-  private loadUsersData() {
-    console.log('🔄 Loading users data...');
+  // Cargar datos de usuarios y su asistencia desde FastAPI
+  private loadUsersWithAttendance() {
+    console.log('🔄 Loading users with attendance data...');
+    const usersUrl = `${this.FASTAPI_URL}/users/with-attendance`;
     
     this.subscription.add(
-      this.userService.getAllUsers().subscribe({
+      this.http.get<UserWithAttendance[]>(usersUrl).subscribe({
         next: (users) => {
-          console.log('✅ Users loaded successfully:', users);
+          console.log('✅ Users with attendance loaded successfully:', users);
           this.updateUserStats(users);
         },
         error: (error) => {
-          console.error('❌ Error loading users:', error);
-          // No parar el loading por error de usuarios
+          console.error('❌ Error loading users with attendance:', error);
+          this.error = 'Failed to load user attendance data. Please try again.';
+          this.updateUserStats([]); // Limpiar datos de usuario en caso de error
         }
       })
     );
   }
 
-  // Cargar datos de speakers usando HttpClient directamente
+  // Cargar datos de speakers (sin cambios)
   private loadSpeakersData() {
     console.log('🔄 Loading speakers data...');
     
@@ -153,32 +171,24 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
             this.setDefaultSpeakerStats();
           }
           
-          this.loading = false;
+          this.loading = false; // El loading termina aquí
         },
         error: (error) => {
           console.error('❌ Error loading speakers:', error);
           this.setDefaultSpeakerStats();
-          this.loading = false;
+          this.loading = false; // El loading también termina aquí
         }
       })
     );
   }
 
-  // Método para actualizar las estadísticas de usuarios
-  private updateUserStats(users: User[]) {
-    const activeUsers = users.filter(user => user.isActive).length;
-    const inactiveUsers = users.filter(user => !user.isActive).length;
-
-    // Actualizar estadísticas de usuarios
+  // Actualizar estadísticas y lista de usuarios
+  private updateUserStats(users: UserWithAttendance[]) {
     this.dashboardData.stats.totalUsers = users.length;
-    this.dashboardData.stats.activeUsers = activeUsers;
-    this.dashboardData.stats.inactiveUsers = inactiveUsers;
+    this.dashboardData.stats.activeUsers = users.filter(user => user.isActive).length;
+    this.dashboardData.stats.inactiveUsers = users.length - this.dashboardData.stats.activeUsers;
     this.dashboardData.stats.lastUpdate = new Date();
-
-    // Obtener los 3 usuarios más recientes
-    this.dashboardData.recentUsers = users
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 3);
+    this.dashboardData.allUsers = users; // Guardar la lista completa de usuarios
 
     console.log('👥 User stats updated:', {
       total: this.dashboardData.stats.totalUsers,
@@ -232,7 +242,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
       lastUpdate: new Date()
     };
     
-    this.dashboardData.recentUsers = [];
+    this.dashboardData.allUsers = [];
     this.dashboardData.recentSpeakers = [];
   }
 
@@ -269,7 +279,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     // Verificar que estamos en el navegador
     if (typeof window !== 'undefined') {
       // Limpiar todos los datos de autenticación del localStorage
-
+      localStorage.clear();
       
       // También limpiar el token genérico que usa el guard
     }
@@ -321,7 +331,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Método utilitario para obtener avatar del usuario
-  getUserAvatar(user: User): string {
+  getUserAvatar(user: UserWithAttendance): string {
     return (user.firstName || user.name).charAt(0).toUpperCase();
   }
 
@@ -348,7 +358,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Método para obtener el rol formateado
-  getUserRole(user: User): string {
+  getUserRole(user: UserWithAttendance): string {
     switch (user.role) {
       case 'SUPERADMIN':
         return 'Super Admin';

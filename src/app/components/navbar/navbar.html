@@ -1,11 +1,55 @@
-<nav class="sara-navbar">
-  <div class="logo-section">
-    <app-logo></app-logo>
+<ng-container *ngIf="showLogoutButton">
+
+  <div 
+    class="dropdown-overlay" 
+    [ngClass]="{ 'active': isUserMenuOpen }" 
+    (click)="closeUserMenu()">
   </div>
-  <button 
-    *ngIf="showLogoutButton" 
-    class="logout-btn logout-btn-desktop" 
-    (click)="onLogout()">
-    Disconnect
-  </button>
-</nav>
+
+  <nav class="sara-navbar">
+    
+    <div class="logo-section">
+      <app-logo></app-logo>
+    </div>
+
+    <div class="user-menu-container">
+      
+      <button 
+        class="user-menu-trigger" 
+        [ngClass]="{ 'active': isUserMenuOpen }"
+        (click)="toggleUserMenu()"
+        aria-haspopup="true"
+        [attr.aria-expanded]="isUserMenuOpen">
+        
+        <span class="user-avatar" aria-hidden="true">👤</span>
+        <span class="user-name">{{ username }}</span>
+        <span class="dropdown-arrow" [ngClass]="{ 'rotated': isUserMenuOpen }" aria-hidden="true">▼</span>
+      </button>
+
+      <div class="user-dropdown" [ngClass]="{ 'open': isUserMenuOpen }">
+        <div class="dropdown-content">
+          
+          <div class="user-info">
+            <div class="user-avatar-large">{{ username.charAt(0) }}</div>
+            <div class="user-details">
+              <div class="user-name-large">{{ username }}</div>
+              <div class="user-email">{{ userEmail }}</div>
+            </div>
+          </div>
+
+
+          <hr class="dropdown-divider">
+
+          <div class="dropdown-actions">
+            <button class="dropdown-item logout-item" (click)="onLogout()">
+              <svg focusable="false" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Desconectar</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+  </nav>
+</ng-container>

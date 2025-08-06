@@ -243,8 +243,11 @@ export class DashboardHome implements OnInit, OnDestroy {
         
         this.loadUserQR();
         this.loadAttendanceRecords();
-        // Iniciar el polling después de cargar los datos del usuario
-        this.startPollingForScans();
+        
+        // Iniciar el polling solo si el usuario es Administrador
+        if (this.isAdmin()) {
+          this.startPollingForScans();
+        }
         
       } catch (e) {
         this.handleAuthError();
@@ -464,15 +467,6 @@ export class DashboardHome implements OnInit, OnDestroy {
     await this.loadUserQR();
   }
 
-  downloadQR(): void {
-    if (!this.qrImageUrl) return;
-
-    const link = document.createElement('a');
-    link.href = this.qrImageUrl;
-    link.download = `QR_${this.user?.name || 'usuario'}.png`;
-    link.click();
-    link.remove();
-  }
 
   getQRImageUrl(): string | null {
     return this.qrImageUrl;
