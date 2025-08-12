@@ -30,6 +30,7 @@ interface QRResponse {
   creado_en: string;
   activo: boolean;
   total_escaneos: number;
+  is_new?: boolean; // NUEVO CAMPO
 }
 
 interface AttendanceRecord {
@@ -93,6 +94,8 @@ export class DashboardHome implements OnInit, OnDestroy {
   notificationType: 'ENTRADA' | 'SALIDA' | null = null;
   private notificationTimeout: any;
   private pollingSubscription: Subscription | null = null;
+
+  isQRNew: boolean = false; // NUEVA PROPIEDAD
   
   newUserData = {
     name: '',
@@ -311,14 +314,22 @@ export class DashboardHome implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
     this.qrImageUrl = null;
+    this.isQRNew = false; // Reset del indicador
 
     try {
       const response = await this.http.get<QRResponse>(`${this.API_URL}/employees/${this.user.id}/qr`).toPromise();
 
       if (response) {
         this.qrCode = response;
+        this.isQRNew = response.is_new || false; // DETECTAR SI ES NUEVO
         this.convertBase64ToImageUrl(response.qr_code_base64);
         this.error = null;
+
+        // Si el QR es nuevo, mostrar notificación temporal
+        if (this.isQRNew) {
+          console.log('🆕 QR Code recién generado detectado');
+          this.showQRNewNotification();
+        }
       } else {
         await this.generateQR();
       }
@@ -331,6 +342,19 @@ export class DashboardHome implements OnInit, OnDestroy {
       }
     } finally {
       this.loading = false;
+    }
+  }
+
+  // NUEVO MÉTODO: Mostrar notificación de QR nuevo
+  private showQRNewNotification(): void {
+    // Puedes usar tu sistema de notificaciones existente
+    // o mostrar un mensaje simple
+    if (this.isQRNew) {
+      setTimeout(() => {
+        console.log('📱 Tu código QR ha sido regenerado con éxito');
+        // Opcional: mostrar una notificación visual
+        this.isQRNew = false; // Quitar el indicador después de unos segundos
+      }, 3000);
     }
   }
 

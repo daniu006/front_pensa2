@@ -30,79 +30,419 @@
         <p>Loading dashboard data...</p>
       </div>
     </div>
-    
-    <div class="stats-grid">
-      <div class="stat-card users-card" >
-        <div class="stat-icon">👥</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ dashboardData.stats.totalUsers }}</div>
-          <div class="stat-label">Total Users</div>
-          <div class="stat-subtitle">
-            {{ dashboardData.stats.activeUsers }} active, 
-            {{ dashboardData.stats.inactiveUsers }} inactive
+
+    <!-- Vista de Navegación -->
+    <div class="view-navigation">
+      <button 
+        class="nav-btn" 
+        [class.active]="activeView === 'dashboard'" 
+        (click)="setActiveView('dashboard')">
+        📊 Dashboard
+      </button>
+      <button 
+        class="nav-btn" 
+        [class.active]="activeView === 'detailed'" 
+        (click)="setActiveView('detailed')">
+        🔍 Búsqueda Detallada
+      </button>
+      <button 
+        class="nav-btn" 
+        [class.active]="activeView === 'weekly'" 
+        (click)="setActiveView('weekly')">
+        📅 Estadísticas Semanales
+      </button>
+      <button 
+        class="nav-btn" 
+        [class.active]="activeView === 'monthly'" 
+        (click)="setActiveView('monthly')">
+        📅 Estadísticas Mensuales
+      </button>
+    </div>
+
+    <!-- Barra de Búsqueda y Filtros -->
+    <div class="search-filters-section" *ngIf="activeView === 'detailed' || activeView === 'dashboard'">
+      <div class="search-bar">
+        <div class="search-input-container">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Buscar por nombre o email..." 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange($event)">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <div class="filters-row">
+        <div class="filter-group">
+          <label>Período:</label>
+          <select class="filter-select" [(ngModel)]="selectedPeriod" (change)="onPeriodChange(selectedPeriod)">
+            <option *ngFor="let option of periodOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group" *ngIf="selectedPeriod === TimePeriod.CUSTOM">
+          <label>Desde:</label>
+          <input 
+            type="date" 
+            class="filter-input" 
+            [(ngModel)]="customStartDate"
+            (change)="onCustomDateChange()">
+        </div>
+
+        <div class="filter-group" *ngIf="selectedPeriod === TimePeriod.CUSTOM">
+          <label>Hasta:</label>
+          <input 
+            type="date" 
+            class="filter-input" 
+            [(ngModel)]="customEndDate"
+            (change)="onCustomDateChange()">
+        </div>
+
+        <div class="filter-group">
+          <label>Estado:</label>
+          <select class="filter-select" [(ngModel)]="selectedStatus" (change)="onStatusChange(selectedStatus)">
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Rol:</label>
+          <select class="filter-select" [(ngModel)]="selectedRole" (change)="onRoleChange(selectedRole)">
+            <option *ngFor="let option of roleOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          🗑️ Limpiar Filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- Vista Dashboard -->
+    <div *ngIf="activeView === 'dashboard'" class="dashboard-view">
+      <!-- Estadísticas Generales -->
+      <div class="stats-grid" *ngIf="attendanceStats">
+        <div class="stat-card today-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ attendanceStats.today?.empleados_activos || 0 }}</div>
+            <div class="stat-label">Empleados Hoy</div>
+            <div class="stat-subtitle">
+              {{ attendanceStats.today?.porcentaje_asistencia || 0 }}% asistencia
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card week-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ attendanceStats.this_week?.empleados_activos || 0 }}</div>
+            <div class="stat-label">Esta Semana</div>
+            <div class="stat-subtitle">
+              {{ attendanceStats.this_week?.horas_trabajadas || '0h 0m' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card month-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ attendanceStats.this_month?.empleados_activos || 0 }}</div>
+            <div class="stat-label">Este Mes</div>
+            <div class="stat-subtitle">
+              {{ attendanceStats.this_month?.horas_trabajadas || '0h 0m' }}
+            </div>
           </div>
         </div>
       </div>
-      </div>
 
-    <div class="bottom-grid">
+      <!-- Empleados Filtrados -->
       <div class="recent-users-section">
-        <h2>Empleados</h2>
+        <h2>Empleados ({{ dashboardData.filteredUsers.length }})</h2>
         
-        <div *ngIf="loading && dashboardData.allUsers.length === 0" class="users-loading">
-          <div class="loading-text">Loading user attendance...</div>
+        <div *ngIf="loading && dashboardData.filteredUsers.length === 0" class="users-loading">
+          <div class="loading-text">Cargando empleados...</div>
         </div>
         
-        <div *ngIf="!loading && dashboardData.allUsers.length === 0" class="empty-users">
+        <div *ngIf="!loading && dashboardData.filteredUsers.length === 0" class="empty-users">
           <div class="empty-icon">👥</div>
-          <div class="empty-text">No Users Found</div>
-          <div class="empty-subtitle">User data could not be loaded or none exist.</div>
+          <div class="empty-text">No se encontraron empleados</div>
+          <div class="empty-subtitle">Intenta ajustar los filtros de búsqueda.</div>
         </div>
         
-        <div class="users-list" *ngIf="dashboardData.allUsers.length > 0">
-          <div class="user-item" *ngFor="let user of dashboardData.allUsers">
+        <div class="users-list" *ngIf="dashboardData.filteredUsers.length > 0">
+          <div class="user-item" *ngFor="let user of dashboardData.filteredUsers">
             <div class="user-avatar">{{ getUserAvatar(user) }}</div>
             <div class="user-info">
               <div class="user-name">{{ user.firstName || user.name }} {{ user.lastName || '' }}</div>
               <div class="user-email">{{ user.email }}</div>
+              <div class="user-role">{{ getUserRole(user) }}</div>
               
               <div class="user-attendance-details">
                 <ng-container *ngIf="user.attendance_today.status !== 'Absent'; else noActivity">
                   <span class="attendance-item">
-                    <strong>IN:</strong> {{ user.attendance_today.hora_entrada || 'N/A' }}
+                    <strong>Entrada:</strong> {{ user.attendance_today.hora_entrada || 'N/A' }}
                   </span>
                   <span class="attendance-item">
-                    <strong>OUT:</strong> {{ user.attendance_today.hora_salida || 'Pending' }}
+                    <strong>Salida:</strong> {{ user.attendance_today.hora_salida || 'Pendiente' }}
                   </span>
                   <span class="attendance-item duration">
-                    <strong>D:</strong> {{ user.attendance_today.duracion_jornada || 'N/A' }}
+                    <strong>Duración:</strong> {{ user.attendance_today.duracion_jornada || 'N/A' }}
                   </span>
                 </ng-container>
                 <ng-template #noActivity>
-                  <span class="attendance-item absent">No activity recorded today</span>
+                  <span class="attendance-item absent">Sin actividad registrada</span>
                 </ng-template>
               </div>
             </div>
             
-            <div class="user-status" [class.active]="user.isActive" [ngClass]="{
-              'present': user.attendance_today.status === 'Present',
-              'completed': user.attendance_today.status === 'Completed',
-              'absent': user.attendance_today.status === 'Absent'
-            }">
-              {{ user.isActive ? user.attendance_today.status : 'Inactive' }}
+            <div class="user-actions">
+              <button class="report-btn" (click)="viewEmployeeReport(user.id)">
+                📊 Ver Reporte
+              </button>
+            </div>
+            
+            <div class="user-status" 
+                 [class.active]="user.isActive" 
+                 [ngClass]="getAttendanceStatusClass(user.attendance_today.status)">
+              {{ getAttendanceStatusText(user) }}
             </div>
           </div>
         </div>
-        
-        </div>
+      </div>
     </div>
 
-    <div class="bottom-grid" *ngIf="dashboardData.stats.totalSpeakers > 0" style="margin-top: 30px;">
+    <!-- Vista Búsqueda Detallada -->
+    <div *ngIf="activeView === 'detailed'" class="detailed-view">
+      <div class="recent-users-section">
+        <h2>Búsqueda Detallada de Empleados ({{ dashboardData.filteredUsers.length }})</h2>
+        
+        <div *ngIf="loading" class="users-loading">
+          <div class="loading-text">Buscando empleados...</div>
         </div>
+        
+        <div *ngIf="!loading && dashboardData.filteredUsers.length === 0" class="empty-users">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-text">No se encontraron resultados</div>
+          <div class="empty-subtitle">Intenta ajustar los criterios de búsqueda.</div>
+        </div>
+        
+        <div class="users-grid" *ngIf="dashboardData.filteredUsers.length > 0">
+          <div class="user-card" *ngFor="let user of dashboardData.filteredUsers">
+            <div class="user-card-header">
+              <div class="user-avatar">{{ getUserAvatar(user) }}</div>
+              <div class="user-basic-info">
+                <h3>{{ user.firstName || user.name }} {{ user.lastName || '' }}</h3>
+                <p>{{ user.email }}</p>
+                <span class="user-role-badge">{{ getUserRole(user) }}</span>
+              </div>
+              <div class="user-status-badge" [ngClass]="getAttendanceStatusClass(user.attendance_today.status)">
+                {{ getAttendanceStatusText(user) }}
+              </div>
+            </div>
+            
+            <div class="user-card-body">
+              <div class="attendance-info">
+                <h4>Información de Asistencia</h4>
+                <div class="attendance-details">
+                  <div class="detail-item">
+                    <span class="label">Estado:</span>
+                    <span class="value" [ngClass]="getAttendanceStatusClass(user.attendance_today.status)">
+                      {{ user.attendance_today.status }}
+                    </span>
+                  </div>
+                  <div class="detail-item" *ngIf="user.attendance_today.hora_entrada">
+                    <span class="label">Entrada:</span>
+                    <span class="value">{{ user.attendance_today.hora_entrada }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="user.attendance_today.hora_salida">
+                    <span class="label">Salida:</span>
+                    <span class="value">{{ user.attendance_today.hora_salida }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="user.attendance_today.duracion_jornada">
+                    <span class="label">Duración:</span>
+                    <span class="value duration">{{ user.attendance_today.duracion_jornada }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="user-card-actions">
+                <button class="action-btn primary" (click)="viewEmployeeReport(user.id)">
+                  📊 Ver Reporte Completo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista Estadísticas Semanales -->
+    <div *ngIf="activeView === 'weekly'" class="weekly-view">
+      <div class="stats-section">
+        <h2>📅 Estadísticas Semanales</h2>
+        
+        <div *ngIf="loading" class="stats-loading">
+          <div class="loading-text">Cargando estadísticas semanales...</div>
+        </div>
+        
+        <div *ngIf="!loading && weeklyStats.length === 0" class="empty-stats">
+          <div class="empty-icon">📅</div>
+          <div class="empty-text">No hay datos semanales disponibles</div>
+        </div>
+        
+        <div class="weekly-stats-grid" *ngIf="weeklyStats.length > 0">
+          <div class="weekly-stat-card" *ngFor="let week of weeklyStats">
+            <div class="stat-header">
+              <h3>{{ formatWeekRange(week.week_start, week.week_end) }}</h3>
+              <span class="week-year">{{ getYearFromDateString(week.week_start) }}</span>
+            </div>
+            
+            <div class="stat-body">
+              <div class="stat-row">
+                <span class="stat-label">Empleados Activos:</span>
+                <span class="stat-value">{{ week.empleados_activos }} / {{ week.total_empleados }}</span>
+              </div>
+              
+              <div class="stat-row">
+                <span class="stat-label">% Asistencia:</span>
+                <span class="stat-value percentage" [ngClass]="{
+                  'high': week.promedio_asistencia >= 80,
+                  'medium': week.promedio_asistencia >= 60 && week.promedio_asistencia < 80,
+                  'low': week.promedio_asistencia < 60
+                }">
+                  {{ week.promedio_asistencia }}%
+                </span>
+              </div>
+              
+              <div class="stat-row">
+                <span class="stat-label">Horas Trabajadas:</span>
+                <span class="stat-value hours">{{ week.total_horas_trabajadas }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista Estadísticas Mensuales -->
+    <div *ngIf="activeView === 'monthly'" class="monthly-view">
+      <div class="stats-section">
+        <h2>📈 Estadísticas Mensuales</h2>
+        
+        <div *ngIf="loading" class="stats-loading">
+          <div class="loading-text">Cargando estadísticas mensuales...</div>
+        </div>
+        
+        <div *ngIf="!loading && monthlyStats.length === 0" class="empty-stats">
+          <div class="empty-icon">📈</div>
+          <div class="empty-text">No hay datos mensuales disponibles</div>
+        </div>
+        
+        <div class="monthly-stats-grid" *ngIf="monthlyStats.length > 0">
+          <div class="monthly-stat-card" *ngFor="let month of monthlyStats">
+            <div class="stat-header">
+              <h3>{{ month.month }} {{ month.year }}</h3>
+              <span class="days-label">{{ month.dias_laborales }} días laborales</span>
+            </div>
+            
+            <div class="stat-body">
+              <div class="stat-row">
+                <span class="stat-label">Empleados Activos:</span>
+                <span class="stat-value">{{ month.empleados_activos }} / {{ month.total_empleados }}</span>
+              </div>
+              
+              <div class="stat-row">
+                <span class="stat-label">% Asistencia:</span>
+                <span class="stat-value percentage" [ngClass]="{
+                  'high': month.promedio_asistencia >= 80,
+                  'medium': month.promedio_asistencia >= 60 && month.promedio_asistencia < 80,
+                  'low': month.promedio_asistencia < 60
+                }">
+                  {{ month.promedio_asistencia }}%
+                </span>
+              </div>
+              
+              <div class="stat-row">
+                <span class="stat-label">Horas Trabajadas:</span>
+                <span class="stat-value hours">{{ month.total_horas_trabajadas }}</span>
+              </div>
+              
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="month.promedio_asistencia"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Reporte de Empleado -->
+    <div *ngIf="selectedEmployeeReport" class="modal-overlay" (click)="closeEmployeeReport()">
+      <div class="modal-content" (click)="stopPropagation($event)">
+        <div class="modal-header">
+          <h2>📊 Reporte de {{ selectedEmployeeReport.empleado_info?.name }}</h2>
+          <button class="modal-close" (click)="closeEmployeeReport()">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="report-summary">
+            <div class="summary-item">
+              <span class="summary-label">Total de Días:</span>
+              <span class="summary-value">{{ selectedEmployeeReport.total_dias }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Días Presente:</span>
+              <span class="summary-value present">{{ selectedEmployeeReport.dias_presente }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Días Ausente:</span>
+              <span class="summary-value absent">{{ selectedEmployeeReport.dias_ausente }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Horas Totales:</span>
+              <span class="summary-value hours">{{ selectedEmployeeReport.horas_totales }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Promedio Diario:</span>
+              <span class="summary-value hours">{{ selectedEmployeeReport.promedio_horas_diarias }}</span>
+            </div>
+          </div>
+          
+          <div class="report-records">
+            <h3>Registros Detallados</h3>
+            <div class="records-list">
+              <div class="record-item" *ngFor="let registro of selectedEmployeeReport.registros">
+                <div class="record-date">
+                  {{ registro.fecha | date:'dd/MM/yyyy' }}
+                </div>
+                <div class="record-times">
+                  <span class="entrada">E: {{ registro.hora_entrada | date:'HH:mm' }}</span>
+                  <span class="salida" *ngIf="registro.hora_salida">
+                    S: {{ registro.hora_salida | date:'HH:mm' }}
+                  </span>
+                  <span class="pendiente" *ngIf="!registro.hora_salida">Pendiente</span>
+                </div>
+                <div class="record-duration" *ngIf="registro.duracion_jornada">
+                  {{ registro.duracion_jornada }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="update-info" *ngIf="!loading">
       <span class="update-text">
-        Last updated: {{ dashboardData.stats.lastUpdate | date:'MMM d, y, h:mm:ss a' }}
+        Última actualización: {{ dashboardData.stats.lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }}
       </span>
     </div>
 
