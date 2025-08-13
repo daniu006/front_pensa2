@@ -32,7 +32,7 @@ interface UserWithAttendance {
 
 interface AttendanceReport {
   empleado_id: number;
-  empleado_info: UserWithAttendance;
+  empleado_info: UserWithAttendance | null;
   total_dias: number;
   dias_presente: number;
   dias_ausente: number;
@@ -109,28 +109,25 @@ enum TimePeriod {
   styleUrl: './advanced-settings.css'
 })
 export class AdvancedSettingsComponent implements OnInit, OnDestroy {
-  
+
   private readonly API_URL = apiURL;
   private readonly FASTAPI_URL = 'https://fastapi-production-b6bb.up.railway.app';
 
   // Filtros y búsqueda
   searchTerm = '';
-  selectedPeriod: TimePeriod = TimePeriod.TODAY;
+  selectedPeriod: string = TimePeriod.TODAY;
   selectedStatus = '';
   selectedRole = '';
   customStartDate = '';
   customEndDate = '';
-  
-  // Subjects para debounce en búsqueda
+
   private searchSubject = new Subject<string>();
-  
-  // Enum para el template
+
   TimePeriod = TimePeriod;
-  
-  // Vista activa
-  activeView: 'dashboard' | 'detailed' | 'weekly' | 'monthly' = 'dashboard';
-  
-  // Datos del dashboard (actualizado)
+
+  // Vista activa: Inicia en null para no mostrar nada al principio.
+  activeView: 'dashboard' | 'weekly' | 'monthly' | null = null;
+
   dashboardData = {
     stats: {
       totalUsers: 0,
@@ -146,7 +143,11 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     recentSpeakers: [] as Speaker[]
   };
 
-  // Datos adicionales
+  // ===== NUEVO: Propiedades para paginación de empleados =====
+  initialUserLimit = 6;
+  displayedUsers: UserWithAttendance[] = [];
+  // =========================================================
+
   attendanceStats: DashboardStats | null = null;
   weeklyStats: WeeklyStats[] = [];
   monthlyStats: MonthlyStats[] = [];
@@ -158,7 +159,6 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   private timeInterval: any;
   private subscription = new Subscription();
 
-  // Opciones para los filtros
   periodOptions = [
     { value: TimePeriod.TODAY, label: 'Hoy' },
     { value: TimePeriod.YESTERDAY, label: 'Ayer' },
@@ -193,15 +193,14 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Inicializar la fecha y hora
+    console.log('🚀 Initializing Advanced Settings Component...');
+
     this.updateCurrentTime();
-    
-    // Actualizar cada segundo
+
     this.timeInterval = setInterval(() => {
       this.updateCurrentTime();
     }, 1000);
 
-    // Configurar búsqueda con debounce
     this.subscription.add(
       this.searchSubject.pipe(
         debounceTime(300),
@@ -211,8 +210,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Cargar datos iniciales
-    this.loadDashboardData();
+    this.loadInitialData();
   }
 
   ngOnDestroy() {
@@ -222,19 +220,65 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  // ==================== MÉTODOS DE CARGA DE DATOS ====================
-
-  loadDashboardData() {
+  private loadInitialData() {
+    console.log('📊 Loading initial dashboard data...');
     this.loading = true;
     this.error = null;
-    
-    console.log('🔄 Loading dashboard data...');
-    
-    // Cargar datos según la vista activa
+
+    this.loadAttendanceStats();
+    this.loadAllUsersOnInit();
+    this.loadSpeakersData();
+  }
+
+  private loadAllUsersOnInit() {
+    console.log('👥 Loading ALL users on initialization (no filters)...');
+
+    const allUsersUrl = `${this.FASTAPI_URL}/attendance/search`;
+
+    this.subscription.add(
+      this.http.get<UserWithAttendance[]>(allUsersUrl).subscribe({
+        next: (users) => {
+          console.log('✅ ALL users loaded on init:', users.length, 'users');
+
+          this.dashboardData.allUsers = users;
+          this.dashboardData.filteredUsers = users;
+          this.updateUserStats(users);
+          this.updateDisplayedUserList(); // <-- CAMBIO: Actualiza la lista visible
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('❌ Error loading initial users:', error);
+          this.error = 'Failed to load user data. Please refresh the page.';
+          this.dashboardData.filteredUsers = [];
+          this.dashboardData.allUsers = [];
+          this.updateDisplayedUserList(); // <-- CAMBIO: Actualiza la lista visible
+          this.loading = false;
+        }
+      })
+    );
+  }
+
+  loadDashboardData() {
+    console.log('🔄 Loading dashboard data for view:', this.activeView);
+
+    this.loading = true;
+    this.error = null;
+
+    if (!this.activeView) {
+      this.loading = false;
+      return;
+    }
+
     switch (this.activeView) {
       case 'dashboard':
         this.loadAttendanceStats();
-        this.loadUsersWithSearch();
+        if (this.hasActiveFilters()) {
+          this.loadUsersWithSearch();
+        } else if (this.dashboardData.allUsers.length === 0) {
+          this.loadAllUsersOnInit();
+        } else {
+          this.loading = false;
+        }
         break;
       case 'weekly':
         this.loadWeeklyStats();
@@ -242,19 +286,25 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
       case 'monthly':
         this.loadMonthlyStats();
         break;
-      case 'detailed':
-        this.loadUsersWithSearch();
-        break;
     }
-    
-    // Siempre cargar speakers para el dashboard general
+
     this.loadSpeakersData();
+  }
+
+  private hasActiveFilters(): boolean {
+    return !!(
+      this.searchTerm.trim() ||
+      this.selectedStatus ||
+      this.selectedRole ||
+      this.selectedPeriod !== TimePeriod.TODAY ||
+      (this.selectedPeriod === TimePeriod.CUSTOM.toString() && (this.customStartDate || this.customEndDate))
+    );
   }
 
   private loadAttendanceStats() {
     console.log('📊 Loading attendance dashboard stats...');
     const statsUrl = `${this.FASTAPI_URL}/attendance/dashboard-stats`;
-    
+
     this.subscription.add(
       this.http.get<DashboardStats>(statsUrl).subscribe({
         next: (stats) => {
@@ -271,48 +321,43 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
 
   private loadUsersWithSearch() {
     console.log('🔍 Loading users with search filters...');
-    
+    this.loading = true; // Activa el loading aquí
     const params = new URLSearchParams();
-    
+
     if (this.searchTerm.trim()) {
       params.append('search', this.searchTerm.trim());
     }
-    
-    if (this.selectedPeriod) {
+    if (this.selectedPeriod && this.selectedPeriod !== TimePeriod.TODAY) {
       params.append('period', this.selectedPeriod);
     }
-    
     if (this.selectedStatus) {
       params.append('status', this.selectedStatus);
     }
-    
     if (this.selectedRole) {
       params.append('role', this.selectedRole);
     }
-    
     if (this.selectedPeriod === TimePeriod.CUSTOM) {
-      if (this.customStartDate) {
-        params.append('start_date', this.customStartDate);
-      }
-      if (this.customEndDate) {
-        params.append('end_date', this.customEndDate);
-      }
+      if (this.customStartDate) params.append('start_date', this.customStartDate);
+      if (this.customEndDate) params.append('end_date', this.customEndDate);
     }
-    
+
     const searchUrl = `${this.FASTAPI_URL}/attendance/search?${params.toString()}`;
-    
+    console.log('🌐 Search URL:', searchUrl);
+
     this.subscription.add(
       this.http.get<UserWithAttendance[]>(searchUrl).subscribe({
         next: (users) => {
-          console.log('✅ Users with filters loaded:', users.length, 'users');
+          console.log('✅ Filtered users loaded:', users.length, 'users');
           this.dashboardData.filteredUsers = users;
           this.updateUserStats(users);
+          this.updateDisplayedUserList(); // <-- CAMBIO: Actualiza la lista visible
           this.loading = false;
         },
         error: (error) => {
-          console.error('❌ Error loading users:', error);
-          this.error = 'Failed to load user data. Please try again.';
+          console.error('❌ Error loading filtered users:', error);
+          this.error = 'Failed to load filtered user data. Please try again.';
           this.dashboardData.filteredUsers = [];
+          this.updateDisplayedUserList(); // <-- CAMBIO: Actualiza la lista visible
           this.loading = false;
         }
       })
@@ -322,7 +367,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   private loadWeeklyStats() {
     console.log('📅 Loading weekly stats...');
     const weeklyUrl = `${this.FASTAPI_URL}/attendance/weekly-stats?weeks_back=8`;
-    
+
     this.subscription.add(
       this.http.get<WeeklyStats[]>(weeklyUrl).subscribe({
         next: (stats) => {
@@ -342,7 +387,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   private loadMonthlyStats() {
     console.log('📅 Loading monthly stats...');
     const monthlyUrl = `${this.FASTAPI_URL}/attendance/monthly-stats?months_back=6`;
-    
+
     this.subscription.add(
       this.http.get<MonthlyStats[]>(monthlyUrl).subscribe({
         next: (stats) => {
@@ -361,16 +406,13 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
 
   private loadSpeakersData() {
     console.log('🔄 Loading speakers data...');
-    
+
     this.subscription.add(
       this.http.get<SpeakersApiResponse>(`${this.API_URL}${speakersApi}`).subscribe({
         next: (response) => {
-          console.log('✅ Speakers loaded successfully:', response);
-          
           if (response.success && response.data) {
             this.updateSpeakerStats(response.data);
           } else {
-            console.warn('⚠️ Invalid speakers response format');
             this.setDefaultSpeakerStats();
           }
         },
@@ -382,14 +424,12 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     );
   }
 
-  // ==================== MÉTODOS DE BÚSQUEDA Y FILTROS ====================
-
   onSearchChange(event: any) {
     this.searchTerm = event.target.value;
     this.searchSubject.next(this.searchTerm);
   }
 
-  onPeriodChange(period: TimePeriod) {
+  onPeriodChange(period: string) {
     this.selectedPeriod = period;
     this.performSearch();
   }
@@ -411,40 +451,68 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   }
 
   private performSearch() {
-    console.log('🔍 Performing search with filters:', {
-      search: this.searchTerm,
-      period: this.selectedPeriod,
-      status: this.selectedStatus,
-      role: this.selectedRole,
-      customDates: this.selectedPeriod === TimePeriod.CUSTOM ? 
-        { start: this.customStartDate, end: this.customEndDate } : null
-    });
-    
+    console.log('🔍 Performing search with filters...');
+
+    if (!this.hasActiveFilters()) {
+      console.log('📋 No active filters, showing all users...');
+      this.dashboardData.filteredUsers = this.dashboardData.allUsers;
+      this.updateUserStats(this.dashboardData.allUsers);
+      this.updateDisplayedUserList(); // <-- CAMBIO: Actualiza la lista visible
+      return;
+    }
+
     this.loadUsersWithSearch();
   }
 
   clearFilters() {
+    console.log('🗑️ Clearing all filters...');
+
     this.searchTerm = '';
     this.selectedPeriod = TimePeriod.TODAY;
     this.selectedStatus = '';
     this.selectedRole = '';
     this.customStartDate = '';
     this.customEndDate = '';
-    this.performSearch();
+
+    this.dashboardData.filteredUsers = this.dashboardData.allUsers;
+    this.updateUserStats(this.dashboardData.allUsers);
+    this.updateDisplayedUserList(); // <-- CAMBIO: Actualiza la lista visible
+
+    console.log('✅ Filters cleared, showing all users:', this.dashboardData.allUsers.length);
   }
 
-  // ==================== MÉTODOS DE VISTA ====================
+  // ===== NUEVO: Método para actualizar la lista de empleados visibles =====
+  private updateDisplayedUserList(): void {
+    console.log('🔄 Updating displayed user list...');
+    this.displayedUsers = this.dashboardData.filteredUsers.slice(0, this.initialUserLimit);
+  }
 
-  setActiveView(view: 'dashboard' | 'detailed' | 'weekly' | 'monthly') {
-    this.activeView = view;
-    this.loadDashboardData();
+  // ===== NUEVO: Método para el botón "Ver más / Ver menos" =====
+  toggleViewMoreUsers(): void {
+    if (this.displayedUsers.length === this.dashboardData.filteredUsers.length) {
+      // Si se muestran todos, volver a la vista inicial
+      this.displayedUsers = this.dashboardData.filteredUsers.slice(0, this.initialUserLimit);
+    } else {
+      // Si se muestra una parte, mostrarlos todos
+      this.displayedUsers = this.dashboardData.filteredUsers;
+    }
+  }
+
+  setActiveView(view: 'dashboard' | 'weekly' | 'monthly') {
+    console.log('🔄 Switching to view:', view);
+    if (this.activeView === view) {
+      this.activeView = null; // Permite ocultar la vista si se hace clic de nuevo
+    } else {
+      this.activeView = view;
+      this.loadDashboardData();
+    }
   }
 
   viewEmployeeReport(empleadoId: number) {
     console.log('📊 Loading employee report for:', empleadoId);
-    
+
     const reportUrl = `${this.FASTAPI_URL}/attendance/report/${empleadoId}?period=${this.selectedPeriod}`;
-    
+
     this.subscription.add(
       this.http.get<AttendanceReport>(reportUrl).subscribe({
         next: (report) => {
@@ -463,39 +531,23 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     this.selectedEmployeeReport = null;
   }
 
-  // ==================== MÉTODOS DE ESTADÍSTICAS ====================
-
   private updateUserStats(users: UserWithAttendance[]) {
     this.dashboardData.stats.totalUsers = users.length;
     this.dashboardData.stats.activeUsers = users.filter(user => user.isActive).length;
     this.dashboardData.stats.inactiveUsers = users.length - this.dashboardData.stats.activeUsers;
     this.dashboardData.stats.lastUpdate = new Date();
-
-    console.log('👥 User stats updated:', {
-      total: this.dashboardData.stats.totalUsers,
-      active: this.dashboardData.stats.activeUsers,
-      inactive: this.dashboardData.stats.inactiveUsers
-    });
   }
 
   private updateSpeakerStats(speakers: Speaker[]) {
     const activeSpeakers = speakers.filter(speaker => speaker.state).length;
-    const inactiveSpeakers = speakers.filter(speaker => !speaker.state).length;
-
     this.dashboardData.stats.totalSpeakers = speakers.length;
     this.dashboardData.stats.activeSpeakers = activeSpeakers;
-    this.dashboardData.stats.inactiveSpeakers = inactiveSpeakers;
+    this.dashboardData.stats.inactiveSpeakers = speakers.length - activeSpeakers;
     this.dashboardData.stats.lastUpdate = new Date();
 
     this.dashboardData.recentSpeakers = speakers
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 3);
-
-    console.log('🔊 Speaker stats updated:', {
-      total: this.dashboardData.stats.totalSpeakers,
-      active: this.dashboardData.stats.activeSpeakers,
-      inactive: this.dashboardData.stats.inactiveSpeakers
-    });
   }
 
   private setDefaultSpeakerStats() {
@@ -503,11 +555,7 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     this.dashboardData.stats.activeSpeakers = 0;
     this.dashboardData.stats.inactiveSpeakers = 0;
     this.dashboardData.recentSpeakers = [];
-    
-    console.log('⚠️ Using default speaker stats due to error');
   }
-
-  // ==================== MÉTODOS UTILITARIOS ====================
 
   private updateCurrentTime() {
     const now = new Date();
@@ -521,8 +569,8 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
       second: '2-digit',
       hour12: true
     };
-    
-    this.currentTime = now.toLocaleDateString('en-US', options);
+
+    this.currentTime = now.toLocaleDateString('es-ES', options);
   }
 
   goBack() {
@@ -530,100 +578,67 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
   }
 
   refreshData() {
-    console.log('🔄 Refreshing dashboard data...');
-    this.loadDashboardData();
-  }
+    console.log('🔄 Refreshing all data...');
+    this.loading = true;
+    this.error = null;
 
-  onLogout(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.clear();
-    }
-    this.router.navigate(['/auth/login']);
+    this.loadAttendanceStats();
+    this.loadAllUsersOnInit(); // Esto ya actualiza la lista de empleados
+    this.loadSpeakersData();
+
+    if (this.activeView === 'weekly') this.loadWeeklyStats();
+    if (this.activeView === 'monthly') this.loadMonthlyStats();
   }
 
   logout() {
-    const confirmLogout = confirm('¿Estás seguro de que quieres desconectarte?');
-    
-    if (confirmLogout) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('roleName');
-      localStorage.removeItem('userSession');
-      
-      if (this.timeInterval) {
-        clearInterval(this.timeInterval);
-      }
-      
-      this.router.navigate([`${loginApi}`]).then(() => {
-        console.log('Logged out successfully');
-      });
+    if (confirm('¿Estás seguro de que quieres desconectarte?')) {
+      localStorage.clear();
+      if (this.timeInterval) clearInterval(this.timeInterval);
+      this.router.navigate([`${loginApi}`]);
     }
   }
 
-  // ==================== MÉTODOS DE FORMATO ====================
-
   getUserAvatar(user: UserWithAttendance): string {
-    return (user.firstName || user.name).charAt(0).toUpperCase();
+    const name = user.firstName || user.name || user.email.split('@')[0] || 'U';
+    return name.charAt(0).toUpperCase();
   }
 
   formatCreatedDate(dateString: string): string {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) {
-      return 'Today';
-    } else if (diffDays === 2) {
-      return 'Yesterday';
-    } else if (diffDays <= 7) {
-      return `${diffDays - 1} days ago`;
-    } else {
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-      });
-    }
+    return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   getUserRole(user: UserWithAttendance): string {
     switch (user.role) {
-      case 'SUPERADMIN':
-        return 'Super Admin';
-      case 'ADMIN':
-        return 'Administrator';
-      case 'USER':
-        return 'User';
-      default:
-        return user.role;
+      case 'SUPERADMIN': return 'Super Admin';
+      case 'ADMIN': return 'Administrador';
+      case 'USER': return 'Usuario';
+      default: return user.role;
     }
   }
 
   getAttendanceStatusClass(status: string): string {
     switch (status) {
-      case 'Present':
-        return 'status-present';
-      case 'Completed':
-        return 'status-completed';
-      case 'Absent':
-        return 'status-absent';
-      default:
-        return 'status-inactive';
+      case 'Presente': return 'status-present';
+      case 'Completado': return 'status-completed';
+      case 'Ausente': return 'status-absent';
+      default: return 'status-inactive';
     }
   }
 
   getAttendanceStatusText(user: UserWithAttendance): string {
-    if (!user.isActive) return 'Inactive';
-    return user.attendance_today.status;
+    if (!user.isActive) return 'Inactivo';
+    switch (user.attendance_today.status) {
+      case 'Present': return 'Presente';
+      case 'Completed': return 'Completado';
+      case 'Absent': return 'Ausente';
+      default: return 'Inactivo';
+    }
   }
 
   formatWeekRange(weekStart: string, weekEnd: string): string {
     const start = new Date(weekStart);
     const end = new Date(weekEnd);
-    
     return `${start.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}`;
   }
 
@@ -631,51 +646,11 @@ export class AdvancedSettingsComponent implements OnInit, OnDestroy {
     this.error = null;
   }
 
-  // Métodos para speakers (mantenidos para compatibilidad)
-  getSpeakerBatteryStatus(batteryPercentage: number): string {
-    if (batteryPercentage > 60) return 'Good';
-    if (batteryPercentage > 30) return 'Medium';
-    if (batteryPercentage > 10) return 'Low';
-    return 'Critical';
-  }
-
-  getSpeakerStatusText(speaker: Speaker): string {
-    if (speaker.state) {
-      return speaker.usageSessions && speaker.usageSessions.length > 0 ? 'In Use' : 'Active';
-    }
-    return 'Inactive';
-  }
-
-  getAverageBatteryPercentage(): number {
-    if (this.dashboardData.recentSpeakers.length === 0) {
-      return 0;
-    }
-    
-    const total = this.dashboardData.recentSpeakers.reduce((sum, speaker) => sum + speaker.batteryPercentage, 0);
-    return Math.round(total / this.dashboardData.recentSpeakers.length);
-  }
-
-  // Método para obtener el año de una fecha
   getYearFromDateString(dateString: string): number {
     return new Date(dateString).getFullYear();
   }
 
-  // Método para stopPropagation en eventos
   stopPropagation(event: Event): void {
     event.stopPropagation();
   }
-
-  navigateToUsers() {
-    console.log('Navigate to users management');
-    this.router.navigate(['/dashboard/users-management']);
-  }
-
-  navigateToSpeakers() {
-    console.log('Navigate to speakers management');
-    this.router.navigate(['/dashboard/speakers-management']);
-  }
-
-  navigateToRoles() {
-    console.log('Navigate to roles management');
-    this.router.navigate(['/dashboard/roles-management']);
-  }}
+}
