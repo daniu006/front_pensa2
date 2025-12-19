@@ -1,10 +1,8 @@
 {
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "ng build --configuration=production",
   "outputDirectory": "dist/frontend_piensa/browser",
+  "framework": "angular",
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

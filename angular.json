@@ -60,25 +60,18 @@
               "namedChunks": true
             },
             "vercel": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "5MB",
-                  "maximumError": "10MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "100kB",
-                  "maximumError": "200kB"
-                }
-              ],
-              "outputHashing": "all",
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true
-            }
+  "budgets": [
+    {
+      "type": "initial",
+      "maximumWarning": "500kb",
+      "maximumError": "1mb"
+    }
+  ],
+  "outputHashing": "all",
+  "optimization": true,
+  "sourceMap": false,
+  "extractLicenses": true
+}
           },
           "defaultConfiguration": "production"
         },
