@@ -1,1 +1,1 @@
-export const apiURL = '/app4api'
+export const apiURL = 'https://backtofastapi-production-0555.up.railway.app'
